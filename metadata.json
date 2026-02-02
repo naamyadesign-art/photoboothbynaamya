@@ -1,0 +1,7 @@
+{
+  "name": "Vintage Carnival Photobooth- naamya",
+  "description": "An immersive, cinematic photobooth experience with red velvet curtains, warm marquee lights, and retro film strip generation.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
