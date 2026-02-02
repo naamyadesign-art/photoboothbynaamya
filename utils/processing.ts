@@ -171,7 +171,7 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
     }
     // Typography
     ctx.fillStyle = '#ffdd99'; ctx.font = 'bold 40px "Special Elite"'; ctx.textAlign = 'center';
-    if(isVertical) ctx.fillText('ADMIT ONE • PHOTOGRAPHE', canvas.width/2, canvas.height - 40);
+    if(isVertical) ctx.fillText('ADMIT ONE • PHOTOBOOTH', canvas.width/2, canvas.height - 40);
   } else if (config.style === 'POSTCARD') {
     // Stamp and branding
     ctx.fillStyle = '#443322'; ctx.font = '30px "Special Elite"'; ctx.globalAlpha = 0.5;
