@@ -1,5 +1,5 @@
 
-import { BoothConfig } from '../App';
+import { BoothConfig } from '../App.tsx';
 
 const loadImage = (url: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {

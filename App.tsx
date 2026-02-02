@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import LandingScreen from './components/LandingScreen';
-import ConfigScreen from './components/ConfigScreen';
-import BoothInterior from './components/BoothInterior';
-import ResultView from './components/ResultView';
+import LandingScreen from './components/LandingScreen.tsx';
+import ConfigScreen from './components/ConfigScreen.tsx';
+import BoothInterior from './components/BoothInterior.tsx';
+import ResultView from './components/ResultView.tsx';
 
 export enum AppState {
   LANDING = 'LANDING',

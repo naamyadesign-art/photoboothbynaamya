@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Download, RefreshCw } from 'lucide-react';
-import { BoothConfig } from '../App';
-import { generateProcessedStrip } from '../utils/processing';
+import { BoothConfig } from '../App.tsx';
+import { generateProcessedStrip } from '../utils/processing.ts';
 
 interface ResultViewProps {
   photos: string[];

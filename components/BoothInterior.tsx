@@ -1,8 +1,9 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, Upload, AlertCircle } from 'lucide-react';
-import { BoothConfig } from '../App';
-import Marquee from './Marquee';
-import { playBeep, playShutter } from '../utils/audio';
+import { BoothConfig } from '../App.tsx';
+import Marquee from './Marquee.tsx';
+import { playBeep, playShutter } from '../utils/audio.ts';
 
 interface BoothInteriorProps {
   config: BoothConfig;
@@ -109,8 +110,6 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
     runCaptureCycle(0);
   };
 
-  // Fixed error: Argument of type 'unknown' is not assignable to parameter of type 'Blob'
-  // by explicitly typing the 'file' argument in the map function.
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;

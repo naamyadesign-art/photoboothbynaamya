@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import Marquee from './Marquee';
+import Marquee from './Marquee.tsx';
 
 interface LandingScreenProps {
   onEnter: () => void;

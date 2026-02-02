@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { Film, Ticket, Sparkles, Camera, Mail, Layers, ChevronRight } from 'lucide-react';
-import { BoothConfig, PhotoStyle, Orientation } from '../App';
-import Marquee from './Marquee';
+import { BoothConfig, PhotoStyle, Orientation } from '../App.tsx';
+import Marquee from './Marquee.tsx';
 
 interface ConfigScreenProps {
   onConfirm: (config: BoothConfig) => void;
