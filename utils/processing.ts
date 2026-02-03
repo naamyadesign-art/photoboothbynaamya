@@ -64,7 +64,7 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
       spacing = 40;
       break;
     case 'ANALOG_STRIP':
-      bgColor = '#2a1a0a'; // Dark brownish/sepia theme
+      bgColor = '#2a1a0a'; 
       margin = 80;
       spacing = 20;
       break;
@@ -76,9 +76,9 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
       spacing = 150;
       break;
     case 'VINTAGE_TV':
-      bgColor = '#222';
-      margin = 100;
-      spacing = 80;
+      bgColor = '#0f0f0f';
+      margin = 320; 
+      spacing = 160;
       break;
     case 'POSTCARD':
       bgColor = '#fcf3e0';
@@ -91,10 +91,13 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
   if (isVertical) {
     canvas.width = imgW + (margin * 2);
     canvas.height = (imgH * 4) + (spacing * 3) + (margin * 2);
-    if (config.style === 'FILM_ROLL') canvas.height += 400; // room for footer
+    // Only add extra room for annotations if enabled
+    if (config.style === 'FILM_ROLL' && config.enableAnnotations) canvas.height += 400;
+    if (config.style === 'VINTAGE_TV') canvas.height += 200;
   } else {
     canvas.width = (imgW * 4) + (spacing * 3) + (margin * 2);
     canvas.height = imgH + (margin * 2);
+    if (config.style === 'VINTAGE_TV') canvas.width += 400;
   }
 
   // Background
@@ -128,31 +131,37 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
       case 'FILM_ROLL': ctx.filter = 'grayscale(1) contrast(1.2) brightness(1.1)'; break;
       case 'MOVIE_TICKET': ctx.filter = 'grayscale(1) contrast(1.3) brightness(1.05)'; break;
       case 'POSTCARD': ctx.filter = 'sepia(0.4) contrast(0.9) brightness(1.05)'; break;
-      case 'VINTAGE_TV': ctx.filter = 'saturate(0.5) contrast(1.1) brightness(0.9)'; break;
+      case 'VINTAGE_TV': ctx.filter = 'saturate(0.4) contrast(1.1) brightness(0.95)'; break;
     }
 
     // FRAMES
     if (config.style === 'VINTAGE_TV') {
-      // Draw TV Body
-      ctx.fillStyle = '#4a3a2a';
+      const bodyColor = i % 2 === 0 ? '#5a4638' : '#3d3025';
+      ctx.fillStyle = bodyColor;
       ctx.beginPath();
-      ctx.roundRect(x - 40, y - 40, imgW + 200, imgH + 80, 40);
+      ctx.roundRect(x - 100, y - 80, imgW + 280, imgH + 160, 50);
       ctx.fill();
-      ctx.strokeStyle = '#222'; ctx.lineWidth = 10; ctx.stroke();
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 15; ctx.stroke();
       
-      // Screen inset
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = '#080808';
       ctx.beginPath();
-      ctx.roundRect(x - 10, y - 10, imgW + 20, imgH + 20, 30);
+      ctx.roundRect(x - 20, y - 20, imgW + 40, imgH + 40, 25);
       ctx.fill();
       
-      // Knobs area
-      ctx.fillStyle = '#333';
-      ctx.fillRect(x + imgW + 15, y - 20, 130, imgH + 40);
-      // Knobs
-      ctx.fillStyle = '#666';
-      ctx.beginPath(); ctx.arc(x + imgW + 80, y + 80, 30, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x + imgW + 80, y + 200, 25, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#151515';
+      ctx.fillRect(x + imgW + 30, y - 50, 130, imgH + 100);
+      
+      ctx.fillStyle = '#777';
+      ctx.beginPath(); ctx.arc(x + imgW + 95, y + 100, 40, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 4; ctx.stroke();
+      
+      ctx.beginPath(); ctx.arc(x + imgW + 95, y + 250, 30, 0, Math.PI*2); ctx.fill();
+      ctx.stroke();
+      
+      ctx.strokeStyle = '#222'; ctx.lineWidth = 4;
+      for (let gy = y + 340; gy < y + imgH + 20; gy += 15) {
+        ctx.beginPath(); ctx.moveTo(x + imgW + 45, gy); ctx.lineTo(x + imgW + 145, gy); ctx.stroke();
+      }
     } else if (config.style === 'MOVIE_TICKET') {
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 2;
@@ -168,12 +177,10 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
     if (config.style === 'FILM_ROLL') {
       ctx.fillStyle = '#fff';
       const hw = 60, hh = 45, hg = 30;
-      // White sprocket holes
       for (let sy = y - 10; sy < y + imgH + 10; sy += (hh + hg)) {
         ctx.beginPath(); ctx.roundRect(40, sy, hw, hh, 8); ctx.fill();
         ctx.beginPath(); ctx.roundRect(canvas.width - 40 - hw, sy, hw, hh, 8); ctx.fill();
       }
-      // Yellow markers
       ctx.fillStyle = '#facc15';
       ctx.font = 'bold 30px Arial';
       ctx.fillText((3 + i).toString(), 110, y + 40);
@@ -181,7 +188,6 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
       ctx.beginPath();
       ctx.moveTo(110, y + imgH - 50); ctx.lineTo(130, y + imgH - 40); ctx.lineTo(110, y + imgH - 30); ctx.fill();
     } else if (config.style === 'MOVIE_TICKET') {
-      // Ticket Text
       ctx.fillStyle = '#000';
       ctx.font = 'bold 35px "Special Elite"';
       ctx.fillText('ONE WAY TICKET', x, y - 25);
@@ -193,14 +199,12 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
       ctx.fillText('to the', x + imgW + 200, y - 50);
       ctx.fillText('childhood', x + imgW + 200, y - 15);
       
-      // Metadata
       ctx.textAlign = 'left';
       ctx.font = '22px Arial';
       ctx.fillText('ADMISSION ________ $ 138', x + imgW + 20, y + 100);
       ctx.fillText('THURSDAY ____ 20/01/25', x + imgW + 20, y + 150);
       ctx.fillText('CARNIVAL ____ RUSSIA', x + imgW + 20, y + 200);
 
-      // Barcode
       ctx.save();
       ctx.translate(x + imgW + 250, y + 10);
       ctx.rotate(Math.PI/2);
@@ -209,7 +213,6 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
       ctx.font = '14px Arial'; ctx.fillText('932489100034 KLD', 10, 115);
       ctx.restore();
       
-      // Serrated line
       ctx.setLineDash([10, 10]);
       ctx.beginPath(); ctx.moveTo(x + imgW + 5, y - 80); ctx.lineTo(x + imgW + 5, y + imgH + 80); ctx.stroke();
       ctx.setLineDash([]);
@@ -217,18 +220,28 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
   });
 
   // STRIP FOOTERS
-  if (config.style === 'FILM_ROLL' && isVertical) {
+  if (config.style === 'FILM_ROLL' && isVertical && config.enableAnnotations) {
     const fy = margin + (4 * (imgH + spacing)) + 50;
     ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-    ctx.font = '80px "Playfair Display"'; ctx.fillText('OLIVIA', canvas.width/2, fy + 100);
-    ctx.font = '40px serif'; ctx.fillText('+', canvas.width/2, fy + 170);
-    ctx.font = '80px "Playfair Display"'; ctx.fillText('ETHAN', canvas.width/2, fy + 260);
-    ctx.font = '30px monospace'; ctx.fillText('01.01.25', canvas.width/2, fy + 330);
+    
+    // Custom Annotation 1
+    ctx.font = '80px "Playfair Display"'; 
+    ctx.fillText(config.annotation1 || 'NAME ONE', canvas.width/2, fy + 100);
+    
+    ctx.font = '40px serif'; 
+    ctx.fillText('+', canvas.width/2, fy + 170);
+    
+    // Custom Annotation 2
+    ctx.font = '80px "Playfair Display"'; 
+    ctx.fillText(config.annotation2 || 'NAME TWO', canvas.width/2, fy + 260);
+    
+    // Custom Date
+    ctx.font = '30px monospace'; 
+    ctx.fillText(config.date || '01.01.25', canvas.width/2, fy + 330);
   } else if (config.style === 'POSTCARD') {
     const sx = canvas.width - 250, sy = 100;
     ctx.strokeStyle = '#444'; ctx.lineWidth = 3; ctx.strokeRect(sx, sy, 150, 180);
     ctx.fillStyle = '#444'; ctx.font = 'bold 30px "Special Elite"'; ctx.fillText('STAMP', sx + 30, sy + 100);
-    // address lines
     ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 250); ctx.lineTo(canvas.width - 100, canvas.height - 250); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 180); ctx.lineTo(canvas.width - 100, canvas.height - 180); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 110); ctx.lineTo(canvas.width - 100, canvas.height - 110); ctx.stroke();

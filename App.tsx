@@ -18,6 +18,10 @@ export type Orientation = 'VERTICAL' | 'HORIZONTAL';
 export interface BoothConfig {
   style: PhotoStyle;
   orientation: Orientation;
+  annotation1: string;
+  annotation2: string;
+  date: string;
+  enableAnnotations: boolean;
 }
 
 const App: React.FC = () => {
@@ -25,7 +29,11 @@ const App: React.FC = () => {
   const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
   const [config, setConfig] = useState<BoothConfig>({
     style: 'FILM_ROLL',
-    orientation: 'VERTICAL'
+    orientation: 'VERTICAL',
+    annotation1: '',
+    annotation2: '',
+    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.'),
+    enableAnnotations: true
   });
 
   const enterConfig = () => setCurrentState(AppState.CONFIG);
@@ -66,6 +74,13 @@ const App: React.FC = () => {
           onRestart={handleRestart} 
         />
       )}
+
+      {/* Persistent Watermark UI Tag - Highly Visible */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none transition-all duration-500">
+        <span className="retro-font text-[10px] sm:text-xs text-amber-400 font-bold tracking-[0.3em] uppercase bg-black/40 px-4 py-2 rounded-full border border-amber-400/40 backdrop-blur-md shadow-[0_0_20px_rgba(251,191,36,0.2)]">
+          @madebynaamya
+        </span>
+      </div>
     </div>
   );
 };

@@ -81,6 +81,9 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
     setCountdown(seconds);
     playBeep();
 
+    // 400ms is roughly 40% faster than the previous 600ms
+    const countdownSpeed = 400;
+
     const timer = setInterval(() => {
       seconds -= 1;
       if (seconds > 0) {
@@ -97,13 +100,13 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
             if (next.length === 4) {
               setTimeout(() => onComplete(next), 600);
             } else {
-              setTimeout(() => runCaptureCycle(currentCount + 1), 1000);
+              setTimeout(() => runCaptureCycle(currentCount + 1), 700);
             }
             return next;
           });
         }
       }
-    }, 1000);
+    }, countdownSpeed);
   };
 
   const startSequence = () => {
