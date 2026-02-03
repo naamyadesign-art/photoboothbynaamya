@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Film, Ticket, Sparkles, Camera, Mail, Layers, ChevronRight } from 'lucide-react';
+import { Film, Ticket, Sparkles, Tv, Mail, Layers, ChevronRight } from 'lucide-react';
 import { BoothConfig, PhotoStyle, Orientation } from '../App.tsx';
 import Marquee from './Marquee.tsx';
 
@@ -13,12 +13,12 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
   const [orientation, setOrientation] = useState<Orientation>('VERTICAL');
 
   const styles: { id: PhotoStyle, label: string, icon: any, desc: string, color: string }[] = [
-    { id: 'FILM_ROLL', label: 'Film Roll', icon: Film, desc: '35mm cinematic celluloid', color: 'amber' },
-    { id: 'ANALOG_STRIP', label: 'Analog Strip', icon: Layers, desc: 'Soft classic faded memory', color: 'zinc' },
-    { id: 'MOVIE_TICKET', label: 'Cinema Ticket', icon: Ticket, desc: 'Vintage "Admit One" frames', color: 'red' },
-    { id: 'RETRO_80S', label: 'Retro 80s', icon: Sparkles, desc: 'Playful doodles & pastels', color: 'pink' },
-    { id: 'CAMERA_FRAME', label: 'Camera View', icon: Camera, desc: 'Through the retro lens', color: 'blue' },
-    { id: 'POSTCARD', label: 'Old Postcard', icon: Mail, desc: 'Textured paper & stamps', color: 'orange' },
+    { id: 'FILM_ROLL', label: 'Film Roll', icon: Film, desc: 'Classic 35mm with sprockets', color: 'amber' },
+    { id: 'ANALOG_STRIP', label: 'Analog Strip', icon: Layers, desc: 'Sepia toned vintage memory', color: 'zinc' },
+    { id: 'MOVIE_TICKET', label: 'Ticket Stub', icon: Ticket, desc: 'Ticket to the childhood', color: 'red' },
+    { id: 'RETRO_80S', label: '80s Neon', icon: Sparkles, desc: 'Retro colors and doodles', color: 'pink' },
+    { id: 'VINTAGE_TV', label: 'TV View', icon: Tv, desc: 'Through the broadcast lens', color: 'blue' },
+    { id: 'POSTCARD', label: 'Postcard', icon: Mail, desc: 'Aged paper and stamps', color: 'orange' },
   ];
 
   return (

@@ -11,6 +11,27 @@ const loadImage = (url: string): Promise<HTMLImageElement> => {
   });
 };
 
+function drawImageCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
+  const imgRatio = img.width / img.height;
+  const targetRatio = w / h;
+  
+  let sWidth, sHeight, sx, sy;
+
+  if (imgRatio > targetRatio) {
+    sHeight = img.height;
+    sWidth = img.height * targetRatio;
+    sx = (img.width - sWidth) / 2;
+    sy = 0;
+  } else {
+    sWidth = img.width;
+    sHeight = img.width / targetRatio;
+    sx = 0;
+    sy = (img.height - sHeight) / 2;
+  }
+
+  ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, w, h);
+}
+
 const applyGrain = (ctx: CanvasRenderingContext2D, width: number, height: number, intensity: number = 20) => {
   const imageData = ctx.getImageData(0, 0, width, height);
   const data = imageData.data;
@@ -23,164 +44,195 @@ const applyGrain = (ctx: CanvasRenderingContext2D, width: number, height: number
   ctx.putImageData(imageData, 0, 0);
 };
 
-// Helper for serrated edges (Tickets)
-const drawSerratedLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, size: number) => {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-  const steps = Math.floor(distance / (size * 2));
-  
-  ctx.save();
-  ctx.globalCompositeOperation = 'destination-out';
-  for (let i = 0; i <= steps; i++) {
-    const px = x1 + (dx / steps) * i;
-    const py = y1 + (dy / steps) * i;
-    ctx.beginPath();
-    ctx.arc(px, py, size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-};
-
 export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: string[], config: BoothConfig) => {
   const images = await Promise.all(photos.map(loadImage));
   const isVertical = config.orientation === 'VERTICAL';
-  
-  const imgW = 800;
-  const imgH = 600;
-  const margin = 100;
-  const spacing = 50;
-  
-  if (isVertical) {
-    canvas.width = imgW + (margin * 2);
-    canvas.height = (imgH * 4) + (spacing * 3) + (margin * 2) + (config.style === 'MOVIE_TICKET' ? 100 : 0);
-  } else {
-    canvas.width = (imgW * 4) + (spacing * 3) + (margin * 2) + (config.style === 'MOVIE_TICKET' ? 100 : 0);
-    canvas.height = imgH + (margin * 2);
-  }
-  
   const ctx = canvas.getContext('2d')!;
 
-  // 1. Background Fill
+  // Layout Constants
+  let imgW = 800;
+  let imgH = 600;
+  let margin = 120;
+  let spacing = 60;
+  let bgColor = '#000';
+
+  // Override by Style
   switch (config.style) {
-    case 'FILM_ROLL': ctx.fillStyle = '#0a0a0a'; break;
-    case 'ANALOG_STRIP': ctx.fillStyle = '#f8f8f8'; break;
-    case 'MOVIE_TICKET': ctx.fillStyle = '#cc4433'; break; // Vintage red
-    case 'RETRO_80S': ctx.fillStyle = '#ffecf2'; break; // Pale pink
-    case 'CAMERA_FRAME': ctx.fillStyle = '#222222'; break;
-    case 'POSTCARD': ctx.fillStyle = '#ece0c8'; break; // Old paper
+    case 'FILM_ROLL':
+      bgColor = '#0a0a0a';
+      margin = 150;
+      spacing = 40;
+      break;
+    case 'ANALOG_STRIP':
+      bgColor = '#2a1a0a'; // Dark brownish/sepia theme
+      margin = 80;
+      spacing = 20;
+      break;
+    case 'MOVIE_TICKET':
+      bgColor = '#ffffff';
+      imgW = 600;
+      imgH = 450;
+      margin = 100;
+      spacing = 150;
+      break;
+    case 'VINTAGE_TV':
+      bgColor = '#222';
+      margin = 100;
+      spacing = 80;
+      break;
+    case 'POSTCARD':
+      bgColor = '#fcf3e0';
+      margin = 100;
+      spacing = 60;
+      break;
   }
+
+  // Canvas Sizing
+  if (isVertical) {
+    canvas.width = imgW + (margin * 2);
+    canvas.height = (imgH * 4) + (spacing * 3) + (margin * 2);
+    if (config.style === 'FILM_ROLL') canvas.height += 400; // room for footer
+  } else {
+    canvas.width = (imgW * 4) + (spacing * 3) + (margin * 2);
+    canvas.height = imgH + (margin * 2);
+  }
+
+  // Background
+  ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // 2. Main Draw Loop
+
+  // Global Textures
+  if (config.style === 'POSTCARD') {
+    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+    ctx.lineWidth = 1;
+    for(let i=0; i<canvas.height; i+=40) {
+      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+    }
+  }
+
   images.forEach((img, i) => {
     let x, y;
-    // Slight imperfect offset for Analog Strip
-    const offset = config.style === 'ANALOG_STRIP' ? (Math.random() - 0.5) * 8 : 0;
-    
     if (isVertical) {
-      x = margin + offset;
+      x = margin;
       y = margin + (i * (imgH + spacing));
     } else {
       x = margin + (i * (imgW + spacing));
-      y = margin + offset;
-    }
-    
-    ctx.save();
-    
-    // Applying Style Specific Filters
-    switch (config.style) {
-      case 'FILM_ROLL': ctx.filter = 'sepia(0.2) contrast(1.1) brightness(0.95) saturate(1.2)'; break;
-      case 'ANALOG_STRIP': ctx.filter = 'contrast(0.95) saturate(0.8) brightness(1.02) sepia(0.05)'; break;
-      case 'MOVIE_TICKET': ctx.filter = 'contrast(1.2) grayscale(0.2) sepia(0.1)'; break;
-      case 'RETRO_80S': ctx.filter = 'saturate(1.5) brightness(1.1) contrast(1.05)'; break;
-      case 'CAMERA_FRAME': ctx.filter = 'contrast(1.1) brightness(0.9) grayscale(0.1)'; break;
-      case 'POSTCARD': ctx.filter = 'sepia(0.3) contrast(1) brightness(1) saturate(0.9)'; break;
+      y = margin;
     }
 
-    // Border/Container for each photo
-    if (config.style === 'ANALOG_STRIP') {
-      ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 20;
-    } else if (config.style === 'POSTCARD') {
-      // Rounded corners for postcard photos
-      ctx.beginPath();
-      ctx.roundRect(x, y, imgW, imgH, 15);
-      ctx.clip();
+    ctx.save();
+
+    // FILTERS
+    switch (config.style) {
+      case 'ANALOG_STRIP': ctx.filter = 'sepia(0.5) contrast(1.1) brightness(0.9)'; break;
+      case 'FILM_ROLL': ctx.filter = 'grayscale(1) contrast(1.2) brightness(1.1)'; break;
+      case 'MOVIE_TICKET': ctx.filter = 'grayscale(1) contrast(1.3) brightness(1.05)'; break;
+      case 'POSTCARD': ctx.filter = 'sepia(0.4) contrast(0.9) brightness(1.05)'; break;
+      case 'VINTAGE_TV': ctx.filter = 'saturate(0.5) contrast(1.1) brightness(0.9)'; break;
     }
-    
-    ctx.drawImage(img, x, y, imgW, imgH);
+
+    // FRAMES
+    if (config.style === 'VINTAGE_TV') {
+      // Draw TV Body
+      ctx.fillStyle = '#4a3a2a';
+      ctx.beginPath();
+      ctx.roundRect(x - 40, y - 40, imgW + 200, imgH + 80, 40);
+      ctx.fill();
+      ctx.strokeStyle = '#222'; ctx.lineWidth = 10; ctx.stroke();
+      
+      // Screen inset
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.roundRect(x - 10, y - 10, imgW + 20, imgH + 20, 30);
+      ctx.fill();
+      
+      // Knobs area
+      ctx.fillStyle = '#333';
+      ctx.fillRect(x + imgW + 15, y - 20, 130, imgH + 40);
+      // Knobs
+      ctx.fillStyle = '#666';
+      ctx.beginPath(); ctx.arc(x + imgW + 80, y + 80, 30, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + imgW + 80, y + 200, 25, 0, Math.PI*2); ctx.fill();
+    } else if (config.style === 'MOVIE_TICKET') {
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, imgW, imgH);
+    }
+
+    // DRAW THE IMAGE
+    drawImageCover(ctx, img, x, y, imgW, imgH);
+
     ctx.restore();
 
-    // 3. Style Specific Overlays (Per Photo)
+    // PER-FRAME OVERLAYS
     if (config.style === 'FILM_ROLL') {
-       // Sprockets
-       ctx.fillStyle = '#000';
-       const holeW = 40; const holeH = 30; const holes = 12;
-       if (isVertical) {
-         for(let s=0; s<holes; s++) {
-           const sy = y + (s * (imgH/holes)) + 10;
-           ctx.beginPath(); ctx.roundRect(margin/4, sy, holeW, holeH, 6); ctx.fill();
-           ctx.beginPath(); ctx.roundRect(canvas.width - margin/4 - holeW, sy, holeW, holeH, 6); ctx.fill();
-         }
-       } else {
-          for(let s=0; s<holes; s++) {
-            const sx = x + (s * (imgW/holes)) + 10;
-            ctx.beginPath(); ctx.roundRect(sx, margin/4, holeW, holeH, 6); ctx.fill();
-            ctx.beginPath(); ctx.roundRect(sx, canvas.height - margin/4 - holeH, holeW, holeH, 6); ctx.fill();
-          }
-       }
-    } else if (config.style === 'RETRO_80S') {
-       // Random doodles
-       ctx.strokeStyle = '#ff77aa'; ctx.lineWidth = 5; ctx.globalAlpha = 0.6;
-       if (i % 2 === 0) {
-         // Star
-         ctx.beginPath(); ctx.moveTo(x+30, y+30); ctx.lineTo(x+50, y+80); ctx.lineTo(x+10, y+50); ctx.lineTo(x+60, y+50); ctx.lineTo(x+20, y+80); ctx.closePath(); ctx.stroke();
-       } else {
-         // Heart
-         ctx.beginPath(); ctx.moveTo(x+imgW-50, y+50); ctx.bezierCurveTo(x+imgW-50, y+47, x+imgW-55, y+35, x+imgW-75, y+35); ctx.bezierCurveTo(x+imgW-95, y+35, x+imgW-95, y+62, x+imgW-95, y+62); ctx.bezierCurveTo(x+imgW-95, y+80, x+imgW-75, y+102, x+imgW-50, y+120); ctx.stroke();
-       }
-       ctx.globalAlpha = 1.0;
-    } else if (config.style === 'CAMERA_FRAME') {
-       // Viewfinder UI
-       ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.globalAlpha = 0.4;
-       ctx.strokeRect(x+50, y+50, 100, 100); // Focus box
-       ctx.fillStyle = '#fff'; ctx.font = '20px Arial'; ctx.fillText('REC', x+70, y+40);
-       ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#fff';
+      const hw = 60, hh = 45, hg = 30;
+      // White sprocket holes
+      for (let sy = y - 10; sy < y + imgH + 10; sy += (hh + hg)) {
+        ctx.beginPath(); ctx.roundRect(40, sy, hw, hh, 8); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(canvas.width - 40 - hw, sy, hw, hh, 8); ctx.fill();
+      }
+      // Yellow markers
+      ctx.fillStyle = '#facc15';
+      ctx.font = 'bold 30px Arial';
+      ctx.fillText((3 + i).toString(), 110, y + 40);
+      ctx.fillText((3 + i) + 'A', 110, y + imgH - 10);
+      ctx.beginPath();
+      ctx.moveTo(110, y + imgH - 50); ctx.lineTo(130, y + imgH - 40); ctx.lineTo(110, y + imgH - 30); ctx.fill();
+    } else if (config.style === 'MOVIE_TICKET') {
+      // Ticket Text
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 35px "Special Elite"';
+      ctx.fillText('ONE WAY TICKET', x, y - 25);
+      ctx.font = '35px "Special Elite"';
+      ctx.fillText('back', x + 310, y - 25);
+      
+      ctx.textAlign = 'right';
+      ctx.font = '35px "Special Elite"';
+      ctx.fillText('to the', x + imgW + 200, y - 50);
+      ctx.fillText('childhood', x + imgW + 200, y - 15);
+      
+      // Metadata
+      ctx.textAlign = 'left';
+      ctx.font = '22px Arial';
+      ctx.fillText('ADMISSION ________ $ 138', x + imgW + 20, y + 100);
+      ctx.fillText('THURSDAY ____ 20/01/25', x + imgW + 20, y + 150);
+      ctx.fillText('CARNIVAL ____ RUSSIA', x + imgW + 20, y + 200);
+
+      // Barcode
+      ctx.save();
+      ctx.translate(x + imgW + 250, y + 10);
+      ctx.rotate(Math.PI/2);
+      ctx.fillRect(0, 0, 300, 10); ctx.fillRect(0, 20, 300, 5); ctx.fillRect(0, 35, 300, 15);
+      ctx.fillRect(0, 60, 300, 5); ctx.fillRect(0, 75, 300, 10); ctx.fillRect(0, 95, 300, 20);
+      ctx.font = '14px Arial'; ctx.fillText('932489100034 KLD', 10, 115);
+      ctx.restore();
+      
+      // Serrated line
+      ctx.setLineDash([10, 10]);
+      ctx.beginPath(); ctx.moveTo(x + imgW + 5, y - 80); ctx.lineTo(x + imgW + 5, y + imgH + 80); ctx.stroke();
+      ctx.setLineDash([]);
     }
   });
 
-  // 4. Global Overlays (Whole Strip)
-  if (config.style === 'MOVIE_TICKET') {
-    // Ticket Serrations
-    const holeSize = 25;
-    if (isVertical) {
-       drawSerratedLine(ctx, 0, 0, 0, canvas.height, holeSize);
-       drawSerratedLine(ctx, canvas.width, 0, canvas.width, canvas.height, holeSize);
-       // Internal dividers
-       images.forEach((_, i) => {
-         if (i < 3) {
-           const dy = margin + (i + 1) * (imgH + spacing) - (spacing/2);
-           ctx.setLineDash([15, 15]); ctx.strokeStyle = '#aa2211'; ctx.lineWidth = 4;
-           ctx.beginPath(); ctx.moveTo(50, dy); ctx.lineTo(canvas.width - 50, dy); ctx.stroke();
-           ctx.setLineDash([]);
-         }
-       });
-    } else {
-       drawSerratedLine(ctx, 0, 0, canvas.width, 0, holeSize);
-       drawSerratedLine(ctx, 0, canvas.height, canvas.width, canvas.height, holeSize);
-    }
-    // Typography
-    ctx.fillStyle = '#ffdd99'; ctx.font = 'bold 40px "Special Elite"'; ctx.textAlign = 'center';
-    if(isVertical) ctx.fillText('ADMIT ONE • PHOTOBOOTH', canvas.width/2, canvas.height - 40);
+  // STRIP FOOTERS
+  if (config.style === 'FILM_ROLL' && isVertical) {
+    const fy = margin + (4 * (imgH + spacing)) + 50;
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+    ctx.font = '80px "Playfair Display"'; ctx.fillText('OLIVIA', canvas.width/2, fy + 100);
+    ctx.font = '40px serif'; ctx.fillText('+', canvas.width/2, fy + 170);
+    ctx.font = '80px "Playfair Display"'; ctx.fillText('ETHAN', canvas.width/2, fy + 260);
+    ctx.font = '30px monospace'; ctx.fillText('01.01.25', canvas.width/2, fy + 330);
   } else if (config.style === 'POSTCARD') {
-    // Stamp and branding
-    ctx.fillStyle = '#443322'; ctx.font = '30px "Special Elite"'; ctx.globalAlpha = 0.5;
-    const cornerX = canvas.width - 150; const cornerY = canvas.height - 150;
-    ctx.strokeRect(cornerX, cornerY, 100, 120);
-    ctx.fillText('STAMP', cornerX + 50, cornerY + 70);
-    ctx.globalAlpha = 1.0;
+    const sx = canvas.width - 250, sy = 100;
+    ctx.strokeStyle = '#444'; ctx.lineWidth = 3; ctx.strokeRect(sx, sy, 150, 180);
+    ctx.fillStyle = '#444'; ctx.font = 'bold 30px "Special Elite"'; ctx.fillText('STAMP', sx + 30, sy + 100);
+    // address lines
+    ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 250); ctx.lineTo(canvas.width - 100, canvas.height - 250); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 180); ctx.lineTo(canvas.width - 100, canvas.height - 180); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 110); ctx.lineTo(canvas.width - 100, canvas.height - 110); ctx.stroke();
   }
 
-  // Final Film Grain
-  applyGrain(ctx, canvas.width, canvas.height, config.style === 'ANALOG_STRIP' ? 12 : 20);
+  applyGrain(ctx, canvas.width, canvas.height, 25);
 };

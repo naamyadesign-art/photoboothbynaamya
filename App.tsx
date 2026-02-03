@@ -12,7 +12,7 @@ export enum AppState {
   RESULTS = 'RESULTS'
 }
 
-export type PhotoStyle = 'FILM_ROLL' | 'ANALOG_STRIP' | 'MOVIE_TICKET' | 'RETRO_80S' | 'CAMERA_FRAME' | 'POSTCARD';
+export type PhotoStyle = 'FILM_ROLL' | 'ANALOG_STRIP' | 'MOVIE_TICKET' | 'RETRO_80S' | 'VINTAGE_TV' | 'POSTCARD';
 export type Orientation = 'VERTICAL' | 'HORIZONTAL';
 
 export interface BoothConfig {

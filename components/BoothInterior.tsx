@@ -29,6 +29,7 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
           video: { 
             width: { ideal: 1280 },
             height: { ideal: 720 },
+            aspectRatio: { ideal: 1.333 }, // 4:3 is standard for booths
             facingMode: 'user'
           } 
         });
@@ -57,6 +58,7 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Use intrinsic video dimensions to avoid stretching
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
@@ -159,7 +161,13 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
             </div>
           ) : (
             <>
-              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                muted 
+                className="w-full h-full object-cover scale-x-[-1]" 
+              />
               
               <div className="absolute inset-0 border-[2px] border-amber-500/20 pointer-events-none flex flex-col justify-between p-2 sm:p-4">
                 <div className="flex justify-between items-start opacity-40">
