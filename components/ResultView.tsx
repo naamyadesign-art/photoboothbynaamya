@@ -39,12 +39,12 @@ const ResultView: React.FC<ResultViewProps> = ({ photos, config, onRestart }) =>
   };
 
   return (
-    <div className="relative h-full w-full bg-[#1a0a0a] flex flex-col items-center justify-center p-4 md:p-8 overflow-y-auto">
+    <div className="relative h-full w-full bg-[#1a0a0a] flex flex-col items-center overflow-y-auto p-4 md:p-8">
       <div className="fixed inset-0 opacity-10 pointer-events-none">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]"></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-5xl flex flex-col items-center gap-8">
+      <div className="relative z-10 w-full max-w-5xl flex flex-col items-center gap-8 py-10 md:py-16 pb-32">
         <div className="text-center">
           <h2 className="title-font text-5xl md:text-7xl text-amber-400 drop-shadow-md">
             VOILÀ!
@@ -63,13 +63,13 @@ const ResultView: React.FC<ResultViewProps> = ({ photos, config, onRestart }) =>
               <img 
                 src={resultUrl || ''} 
                 alt="Photobooth Strip" 
-                className="max-w-full max-h-[70vh] block shadow-2xl transition-transform hover:scale-[1.01]"
+                className="max-w-full max-h-[75vh] block shadow-2xl transition-transform hover:scale-[1.01]"
               />
             </div>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-4 mt-4">
           <button
             onClick={handleDownload}
             disabled={isProcessing}
