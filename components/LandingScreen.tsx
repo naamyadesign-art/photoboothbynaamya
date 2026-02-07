@@ -37,7 +37,7 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onEnter }) => {
             PHOTOBOOTH
           </h1>
           <p className="retro-font text-sm sm:text-xl md:text-2xl text-amber-100/80 tracking-[0.15em] sm:tracking-widest uppercase">
-            Grand Carnival • Est. 1924
+            Grand Carnival • Est. 2005
           </p>
         </div>
 

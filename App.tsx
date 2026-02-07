@@ -12,7 +12,19 @@ export enum AppState {
   RESULTS = 'RESULTS'
 }
 
-export type PhotoStyle = 'FILM_ROLL' | 'ANALOG_STRIP' | 'MOVIE_TICKET' | 'RETRO_80S' | 'VINTAGE_TV' | 'POSTCARD';
+export type PhotoStyle = 
+  | 'FILM_ROLL' 
+  | 'ANALOG_STRIP' 
+  | 'MOVIE_TICKET' 
+  | 'RETRO_80S' 
+  | 'VINTAGE_TV' 
+  | 'POSTCARD'
+  | 'VAL_BE_MINE'
+  | 'VAL_BOWS'
+  | 'VAL_KISSES'
+  | 'VAL_RIBBON'
+  | 'VAL_HAPPY_CHERRY';
+
 export type Orientation = 'VERTICAL' | 'HORIZONTAL';
 
 export interface BoothConfig {
@@ -22,18 +34,24 @@ export interface BoothConfig {
   annotation2: string;
   date: string;
   enableAnnotations: boolean;
+  annotationFont: string;
 }
 
 const App: React.FC = () => {
   const [currentState, setCurrentState] = useState<AppState>(AppState.LANDING);
   const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
+  
+  const now = new Date();
+  const isValentinesSeason = now.getMonth() === 1 && now.getDate() <= 14;
+
   const [config, setConfig] = useState<BoothConfig>({
-    style: 'FILM_ROLL',
+    style: isValentinesSeason ? 'VAL_HAPPY_CHERRY' : 'FILM_ROLL',
     orientation: 'VERTICAL',
     annotation1: '',
     annotation2: '',
-    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.'),
-    enableAnnotations: true
+    date: now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.'),
+    enableAnnotations: true,
+    annotationFont: isValentinesSeason ? 'Pacifico' : 'Playfair Display'
   });
 
   const enterConfig = () => setCurrentState(AppState.CONFIG);
@@ -54,7 +72,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-zinc-950 text-amber-50 selection:bg-amber-900">
+    <div className={`relative h-screen w-screen overflow-hidden transition-colors duration-700 ${config.style.startsWith('VAL') ? 'bg-rose-50' : 'bg-zinc-950'} selection:bg-rose-200`}>
       {currentState === AppState.LANDING && (
         <LandingScreen onEnter={enterConfig} />
       )}
@@ -75,7 +93,7 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Persistent Watermark UI Tag - Highly Visible */}
+      {/* Restored static watermark style */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none transition-all duration-500">
         <span className="retro-font text-[10px] sm:text-xs text-amber-400 font-bold tracking-[0.3em] uppercase bg-black/40 px-4 py-2 rounded-full border border-amber-400/40 backdrop-blur-md shadow-[0_0_20px_rgba(251,191,36,0.2)]">
           @madebynaamya

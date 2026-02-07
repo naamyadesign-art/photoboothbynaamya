@@ -11,25 +11,129 @@ const loadImage = (url: string): Promise<HTMLImageElement> => {
   });
 };
 
-function drawImageCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
+function pathHeart(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  // Enhanced heart path: more bulbous and fills the bounding square better
+  ctx.beginPath();
+  const topCenter = { x: x + w / 2, y: y + h * 0.28 };
+  ctx.moveTo(topCenter.x, topCenter.y);
+  
+  // Left curve
+  ctx.bezierCurveTo(
+    x + w * 0.15, y - h * 0.05, 
+    x - w * 0.15, y + h * 0.35, 
+    x + w / 2, y + h * 0.98     
+  );
+  
+  // Right curve
+  ctx.bezierCurveTo(
+    x + w * 1.15, y + h * 0.35, 
+    x + w * 0.85, y - h * 0.05, 
+    topCenter.x, topCenter.y     
+  );
+  ctx.closePath();
+}
+
+function pathOval(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  ctx.beginPath();
+  ctx.ellipse(x + w / 2, y + h / 2, w / 2, h * 0.45, 0, 0, Math.PI * 2);
+  ctx.closePath();
+}
+
+function pathCircle(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  ctx.beginPath();
+  ctx.arc(x + w / 2, y + h / 2, Math.min(w, h) / 2.05, 0, Math.PI * 2);
+  ctx.closePath();
+}
+
+function drawScallopedBorder(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string, type: 'HEART' | 'CIRCLE' | 'OVAL') {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 18;
+  ctx.setLineDash([15, 12]);
+  ctx.lineCap = 'round';
+  if (type === 'HEART') pathHeart(ctx, x, y, w, h);
+  else if (type === 'OVAL') pathOval(ctx, x, y, w, h);
+  else pathCircle(ctx, x, y, w, h);
+  ctx.stroke();
+  
+  ctx.lineWidth = 2;
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 0.5;
+  if (type === 'HEART') pathHeart(ctx, x, y, w, h);
+  else if (type === 'OVAL') pathOval(ctx, x, y, w, h);
+  else pathCircle(ctx, x, y, w, h);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawCherry(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  ctx.save();
+  ctx.fillStyle = '#ff1d58';
+  ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 15, y + 5, 12, 0, Math.PI*2); ctx.fill();
+  
+  ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(x, y-5); ctx.quadraticCurveTo(x + 8, y - 30, x + 10, y - 35); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x + 15, y-1); ctx.quadraticCurveTo(x + 12, y - 30, x + 10, y - 35); ctx.stroke();
+  
+  ctx.fillStyle = 'white'; ctx.globalAlpha = 0.4;
+  ctx.beginPath(); ctx.arc(x-3, y-3, 3, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawLipPrint(ctx: CanvasRenderingContext2D, x: number, y: number, scale = 1) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scale, scale);
+  ctx.fillStyle = '#ff4d6d';
+  ctx.beginPath();
+  ctx.ellipse(0, -5, 20, 10, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(0, 5, 20, 10, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function drawRibbonBow(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, scale = 1) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scale, scale);
+  ctx.fillStyle = color;
+  // Left loop
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(-60, -40, -60, 40, 0, 0);
+  ctx.fill();
+  // Right loop
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(60, -40, 60, 40, 0, 0);
+  ctx.fill();
+  // Center knot
+  ctx.fillRect(-10, -10, 20, 20);
+  ctx.restore();
+}
+
+function drawImageCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number, shape: 'RECT' | 'HEART' | 'CIRCLE' | 'OVAL' = 'RECT') {
   const imgRatio = img.width / img.height;
   const targetRatio = w / h;
-  
   let sWidth, sHeight, sx, sy;
-
+  
   if (imgRatio > targetRatio) {
-    sHeight = img.height;
-    sWidth = img.height * targetRatio;
-    sx = (img.width - sWidth) / 2;
-    sy = 0;
+    sHeight = img.height; sWidth = img.height * targetRatio;
+    sx = (img.width - sWidth) / 2; sy = 0;
   } else {
-    sWidth = img.width;
-    sHeight = img.width / targetRatio;
-    sx = 0;
-    sy = (img.height - sHeight) / 2;
+    sWidth = img.width; sHeight = img.width / targetRatio;
+    sx = 0; sy = (img.height - sHeight) / 2;
   }
-
+  
+  ctx.save();
+  if (shape === 'HEART') pathHeart(ctx, x, y, w, h);
+  else if (shape === 'CIRCLE') pathCircle(ctx, x, y, w, h);
+  else if (shape === 'OVAL') pathOval(ctx, x, y, w, h);
+  
+  if (shape !== 'RECT') ctx.clip();
   ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, w, h);
+  ctx.restore();
 }
 
 const applyGrain = (ctx: CanvasRenderingContext2D, width: number, height: number, intensity: number = 20) => {
@@ -49,203 +153,124 @@ export const generateProcessedStrip = async (canvas: HTMLCanvasElement, photos: 
   const isVertical = config.orientation === 'VERTICAL';
   const ctx = canvas.getContext('2d')!;
 
-  // Layout Constants
-  let imgW = 800;
-  let imgH = 600;
-  let margin = 120;
-  let spacing = 60;
+  let imgW = 800; let imgH = 600;
+  let margin = 120; let spacing = 60;
   let bgColor = '#000';
+  const isVal = config.style.startsWith('VAL');
 
-  // Override by Style
   switch (config.style) {
-    case 'FILM_ROLL':
-      bgColor = '#0a0a0a';
-      margin = 150;
-      spacing = 40;
-      break;
-    case 'ANALOG_STRIP':
-      bgColor = '#2a1a0a'; 
-      margin = 80;
-      spacing = 20;
-      break;
-    case 'MOVIE_TICKET':
-      bgColor = '#ffffff';
-      imgW = 600;
-      imgH = 450;
-      margin = 100;
-      spacing = 150;
-      break;
-    case 'VINTAGE_TV':
-      bgColor = '#0f0f0f';
-      margin = 320; 
-      spacing = 160;
-      break;
-    case 'POSTCARD':
-      bgColor = '#fcf3e0';
-      margin = 100;
-      spacing = 60;
-      break;
+    case 'FILM_ROLL': bgColor = '#0a0a0a'; margin = 150; spacing = 40; break;
+    case 'VAL_BE_MINE': bgColor = '#fff1f2'; margin = 180; spacing = 80; imgW = 850; imgH = 850; break;
+    case 'VAL_HAPPY_CHERRY': bgColor = '#fff5f5'; margin = 180; spacing = 80; imgW = 850; imgH = 850; break;
+    case 'VAL_BOWS': bgColor = '#fff0f3'; margin = 200; spacing = 100; imgW = 800; imgH = 600; break;
+    case 'VAL_KISSES': bgColor = '#fff'; margin = 180; spacing = 90; imgW = 850; imgH = 650; break;
+    case 'VAL_RIBBON': bgColor = '#ff1d58'; margin = 220; spacing = 60; imgW = 800; imgH = 600; break;
+    default: bgColor = '#000'; margin = 120; spacing = 60; break;
   }
 
-  // Canvas Sizing
   if (isVertical) {
     canvas.width = imgW + (margin * 2);
-    canvas.height = (imgH * 4) + (spacing * 3) + (margin * 2);
-    // Only add extra room for annotations if enabled
-    if (config.style === 'FILM_ROLL' && config.enableAnnotations) canvas.height += 400;
-    if (config.style === 'VINTAGE_TV') canvas.height += 200;
+    canvas.height = (imgH * 4) + (spacing * 3) + (margin * 2) + 400;
   } else {
     canvas.width = (imgW * 4) + (spacing * 3) + (margin * 2);
-    canvas.height = imgH + (margin * 2);
-    if (config.style === 'VINTAGE_TV') canvas.width += 400;
+    canvas.height = imgH + (margin * 2) + 250;
   }
 
-  // Background
-  ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Global Textures
-  if (config.style === 'POSTCARD') {
-    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
-    ctx.lineWidth = 1;
-    for(let i=0; i<canvas.height; i+=40) {
-      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+  // Background patterns for Valentine
+  if (isVal) {
+    ctx.save();
+    if (config.style === 'VAL_KISSES') {
+      for (let i = 0; i < 60; i++) {
+        ctx.globalAlpha = 0.1;
+        drawLipPrint(ctx, Math.random() * canvas.width, Math.random() * canvas.height, 0.5 + Math.random());
+      }
+    } else if (config.style === 'VAL_BE_MINE' || config.style === 'VAL_HAPPY_CHERRY') {
+      for (let i = 0; i < 40; i++) {
+        ctx.globalAlpha = 0.15;
+        drawCherry(ctx, Math.random() * canvas.width, Math.random() * canvas.height);
+      }
+    } else if (config.style === 'VAL_BOWS') {
+        for (let i = 0; i < 30; i++) {
+            ctx.globalAlpha = 0.1;
+            drawRibbonBow(ctx, Math.random() * canvas.width, Math.random() * canvas.height, '#ffb7c5', 0.4);
+        }
     }
+    ctx.restore();
   }
 
   images.forEach((img, i) => {
     let x, y;
-    if (isVertical) {
-      x = margin;
-      y = margin + (i * (imgH + spacing));
-    } else {
-      x = margin + (i * (imgW + spacing));
-      y = margin;
-    }
+    if (isVertical) { x = margin; y = margin + (i * (imgH + spacing)); }
+    else { x = margin + (i * (imgW + spacing)); y = margin; }
 
     ctx.save();
+    if (isVal) ctx.filter = 'contrast(1.08) brightness(1.02) saturate(1.15)';
 
-    // FILTERS
-    switch (config.style) {
-      case 'ANALOG_STRIP': ctx.filter = 'sepia(0.5) contrast(1.1) brightness(0.9)'; break;
-      case 'FILM_ROLL': ctx.filter = 'grayscale(1) contrast(1.2) brightness(1.1)'; break;
-      case 'MOVIE_TICKET': ctx.filter = 'grayscale(1) contrast(1.3) brightness(1.05)'; break;
-      case 'POSTCARD': ctx.filter = 'sepia(0.4) contrast(0.9) brightness(1.05)'; break;
-      case 'VINTAGE_TV': ctx.filter = 'saturate(0.4) contrast(1.1) brightness(0.95)'; break;
-    }
+    let shape: 'RECT' | 'HEART' | 'CIRCLE' | 'OVAL' = 'RECT';
+    if (config.style === 'VAL_BE_MINE') shape = 'CIRCLE';
+    else if (config.style === 'VAL_HAPPY_CHERRY') shape = 'HEART';
+    else if (config.style === 'VAL_KISSES') shape = 'OVAL';
 
-    // FRAMES
-    if (config.style === 'VINTAGE_TV') {
-      const bodyColor = i % 2 === 0 ? '#5a4638' : '#3d3025';
-      ctx.fillStyle = bodyColor;
-      ctx.beginPath();
-      ctx.roundRect(x - 100, y - 80, imgW + 280, imgH + 160, 50);
-      ctx.fill();
-      ctx.strokeStyle = '#111'; ctx.lineWidth = 15; ctx.stroke();
-      
-      ctx.fillStyle = '#080808';
-      ctx.beginPath();
-      ctx.roundRect(x - 20, y - 20, imgW + 40, imgH + 40, 25);
-      ctx.fill();
-      
-      ctx.fillStyle = '#151515';
-      ctx.fillRect(x + imgW + 30, y - 50, 130, imgH + 100);
-      
-      ctx.fillStyle = '#777';
-      ctx.beginPath(); ctx.arc(x + imgW + 95, y + 100, 40, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = '#333'; ctx.lineWidth = 4; ctx.stroke();
-      
-      ctx.beginPath(); ctx.arc(x + imgW + 95, y + 250, 30, 0, Math.PI*2); ctx.fill();
-      ctx.stroke();
-      
-      ctx.strokeStyle = '#222'; ctx.lineWidth = 4;
-      for (let gy = y + 340; gy < y + imgH + 20; gy += 15) {
-        ctx.beginPath(); ctx.moveTo(x + imgW + 45, gy); ctx.lineTo(x + imgW + 145, gy); ctx.stroke();
-      }
-    } else if (config.style === 'MOVIE_TICKET') {
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(x, y, imgW, imgH);
-    }
+    if (shape === 'HEART') drawScallopedBorder(ctx, x, y, imgW, imgH, '#ff4d6d', 'HEART');
+    if (shape === 'CIRCLE') drawScallopedBorder(ctx, x, y, imgW, imgH, '#ff85a2', 'CIRCLE');
+    if (shape === 'OVAL') drawScallopedBorder(ctx, x, y, imgW, imgH, '#ff4d6d', 'OVAL');
 
-    // DRAW THE IMAGE
-    drawImageCover(ctx, img, x, y, imgW, imgH);
-
+    drawImageCover(ctx, img, x, y, imgW, imgH, shape);
     ctx.restore();
-
-    // PER-FRAME OVERLAYS
-    if (config.style === 'FILM_ROLL') {
-      ctx.fillStyle = '#fff';
-      const hw = 60, hh = 45, hg = 30;
-      for (let sy = y - 10; sy < y + imgH + 10; sy += (hh + hg)) {
-        ctx.beginPath(); ctx.roundRect(40, sy, hw, hh, 8); ctx.fill();
-        ctx.beginPath(); ctx.roundRect(canvas.width - 40 - hw, sy, hw, hh, 8); ctx.fill();
-      }
-      ctx.fillStyle = '#facc15';
-      ctx.font = 'bold 30px Arial';
-      ctx.fillText((3 + i).toString(), 110, y + 40);
-      ctx.fillText((3 + i) + 'A', 110, y + imgH - 10);
-      ctx.beginPath();
-      ctx.moveTo(110, y + imgH - 50); ctx.lineTo(130, y + imgH - 40); ctx.lineTo(110, y + imgH - 30); ctx.fill();
-    } else if (config.style === 'MOVIE_TICKET') {
-      ctx.fillStyle = '#000';
-      ctx.font = 'bold 35px "Special Elite"';
-      ctx.fillText('ONE WAY TICKET', x, y - 25);
-      ctx.font = '35px "Special Elite"';
-      ctx.fillText('back', x + 310, y - 25);
-      
-      ctx.textAlign = 'right';
-      ctx.font = '35px "Special Elite"';
-      ctx.fillText('to the', x + imgW + 200, y - 50);
-      ctx.fillText('childhood', x + imgW + 200, y - 15);
-      
-      ctx.textAlign = 'left';
-      ctx.font = '22px Arial';
-      ctx.fillText('ADMISSION ________ $ 138', x + imgW + 20, y + 100);
-      ctx.fillText('THURSDAY ____ 20/01/25', x + imgW + 20, y + 150);
-      ctx.fillText('CARNIVAL ____ RUSSIA', x + imgW + 20, y + 200);
-
-      ctx.save();
-      ctx.translate(x + imgW + 250, y + 10);
-      ctx.rotate(Math.PI/2);
-      ctx.fillRect(0, 0, 300, 10); ctx.fillRect(0, 20, 300, 5); ctx.fillRect(0, 35, 300, 15);
-      ctx.fillRect(0, 60, 300, 5); ctx.fillRect(0, 75, 300, 10); ctx.fillRect(0, 95, 300, 20);
-      ctx.font = '14px Arial'; ctx.fillText('932489100034 KLD', 10, 115);
-      ctx.restore();
-      
-      ctx.setLineDash([10, 10]);
-      ctx.beginPath(); ctx.moveTo(x + imgW + 5, y - 80); ctx.lineTo(x + imgW + 5, y + imgH + 80); ctx.stroke();
-      ctx.setLineDash([]);
-    }
+    
+    // Per frame decorations
+    if (config.style === 'VAL_BE_MINE') drawCherry(ctx, x + imgW - 40, y + 40);
+    if (config.style === 'VAL_HAPPY_CHERRY') drawCherry(ctx, x + 40, y + 40);
+    if (config.style === 'VAL_KISSES') drawLipPrint(ctx, x + imgW - 50, y + 50, 0.8);
   });
 
-  // STRIP FOOTERS
-  if (config.style === 'FILM_ROLL' && isVertical && config.enableAnnotations) {
-    const fy = margin + (4 * (imgH + spacing)) + 50;
-    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  // Header / Decorative elements
+  if (isVertical && isVal) {
+    ctx.textAlign = 'center';
+    ctx.fillStyle = config.style === 'VAL_RIBBON' ? 'white' : '#ff4d6d';
     
-    // Custom Annotation 1
-    ctx.font = '80px "Playfair Display"'; 
-    ctx.fillText(config.annotation1 || 'NAME ONE', canvas.width/2, fy + 100);
-    
-    ctx.font = '40px serif'; 
-    ctx.fillText('+', canvas.width/2, fy + 170);
-    
-    // Custom Annotation 2
-    ctx.font = '80px "Playfair Display"'; 
-    ctx.fillText(config.annotation2 || 'NAME TWO', canvas.width/2, fy + 260);
-    
-    // Custom Date
-    ctx.font = '30px monospace'; 
-    ctx.fillText(config.date || '01.01.25', canvas.width/2, fy + 330);
-  } else if (config.style === 'POSTCARD') {
-    const sx = canvas.width - 250, sy = 100;
-    ctx.strokeStyle = '#444'; ctx.lineWidth = 3; ctx.strokeRect(sx, sy, 150, 180);
-    ctx.fillStyle = '#444'; ctx.font = 'bold 30px "Special Elite"'; ctx.fillText('STAMP', sx + 30, sy + 100);
-    ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 250); ctx.lineTo(canvas.width - 100, canvas.height - 250); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 180); ctx.lineTo(canvas.width - 100, canvas.height - 180); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(canvas.width/2, canvas.height - 110); ctx.lineTo(canvas.width - 100, canvas.height - 110); ctx.stroke();
+    if (config.style === 'VAL_BE_MINE') {
+      ctx.font = 'bold 90px "Pacifico"';
+      ctx.fillText('Be Mine', canvas.width/2, margin - 60);
+    } else if (config.style === 'VAL_HAPPY_CHERRY') {
+      ctx.font = 'bold 70px "Pacifico"';
+      ctx.fillText('Happy', canvas.width/2, margin - 100);
+      ctx.font = 'bold 90px "Bungee Shade"';
+      ctx.fillText('VALENTINES', canvas.width/2, margin - 30);
+    } else if (config.style === 'VAL_RIBBON') {
+      drawRibbonBow(ctx, canvas.width/2, margin - 120, 'white', 1.5);
+      ctx.font = 'bold 100px "Bungee Shade"';
+      ctx.fillText('VALENTINES', canvas.width/2, margin - 30);
+    } else if (config.style === 'VAL_BOWS') {
+        drawRibbonBow(ctx, canvas.width/2, margin - 110, '#ff4d6d', 1.8);
+    } else if (config.style === 'VAL_KISSES') {
+        ctx.font = 'bold 85px "Pacifico"';
+        ctx.fillText('Valentine\'s Day', canvas.width/2, margin - 50);
+    }
   }
 
-  applyGrain(ctx, canvas.width, canvas.height, 25);
+  // Footer Signature
+  if (config.enableAnnotations && isVertical) {
+    const fy = (imgH * 4) + (spacing * 3) + margin + 140;
+    ctx.fillStyle = (isVal && config.style !== 'VAL_RIBBON') ? '#ff4d6d' : (config.style === 'VAL_RIBBON' ? 'white' : '#fff');
+    const sigFont = config.annotationFont || (isVal ? 'Pacifico' : 'Playfair Display');
+    
+    ctx.font = `bold 110px "${sigFont}"`;
+    ctx.fillText(config.annotation1 || 'STUDIO', canvas.width/2, fy);
+    
+    ctx.font = `bold 45px "Special Elite"`;
+    ctx.fillText('&', canvas.width/2, fy + 70);
+    
+    ctx.font = `bold 110px "${sigFont}"`;
+    ctx.fillText(config.annotation2 || 'LOVER', canvas.width/2, fy + 160);
+    
+    ctx.font = '35px monospace';
+    ctx.globalAlpha = 0.6;
+    ctx.fillText(config.date, canvas.width/2, fy + 240);
+    ctx.globalAlpha = 1.0;
+  }
+
+  applyGrain(ctx, canvas.width, canvas.height, 18);
 };

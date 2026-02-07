@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Film, Ticket, Sparkles, Tv, Mail, Layers, ChevronRight, User, ToggleLeft, ToggleRight } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Film, Ticket, Sparkles, Tv, Mail, Layers, ChevronRight, User, ToggleLeft, ToggleRight, Type, Heart, Circle, Star } from 'lucide-react';
 import { BoothConfig, PhotoStyle, Orientation } from '../App.tsx';
 import Marquee from './Marquee.tsx';
 
@@ -9,11 +9,18 @@ interface ConfigScreenProps {
 }
 
 const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
-  const [style, setStyle] = useState<PhotoStyle>('FILM_ROLL');
+  const isValentinesSeason = useMemo(() => {
+    const now = new Date();
+    return now.getMonth() === 1 && now.getDate() <= 14;
+  }, []);
+
+  const [viewMode, setViewMode] = useState<'CLASSIC' | 'VALENTINE'>(isValentinesSeason ? 'VALENTINE' : 'CLASSIC');
+  const [style, setStyle] = useState<PhotoStyle>(viewMode === 'VALENTINE' ? 'VAL_HAPPY_CHERRY' : 'FILM_ROLL');
   const [orientation, setOrientation] = useState<Orientation>('VERTICAL');
-  const [annotation1, setAnnotation1] = useState('NAME ONE');
-  const [annotation2, setAnnotation2] = useState('NAME TWO');
+  const [annotation1, setAnnotation1] = useState('NAME 1');
+  const [annotation2, setAnnotation2] = useState('NAME 2');
   const [enableAnnotations, setEnableAnnotations] = useState(true);
+  const [annotationFont, setAnnotationFont] = useState(viewMode === 'VALENTINE' ? 'Pacifico' : 'Playfair Display');
   
   const today = new Date().toLocaleDateString('en-GB', { 
     day: '2-digit', 
@@ -22,158 +29,223 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
   }).replace(/\//g, '.');
   const [date, setDate] = useState(today);
 
-  const styles: { id: PhotoStyle, label: string, icon: any, desc: string, color: string }[] = [
-    { id: 'FILM_ROLL', label: 'Film Roll', icon: Film, desc: 'Classic 35mm with sprockets', color: 'amber' },
-    { id: 'ANALOG_STRIP', label: 'Analog Strip', icon: Layers, desc: 'Sepia toned vintage memory', color: 'zinc' },
-    { id: 'MOVIE_TICKET', label: 'Ticket Stub', icon: Ticket, desc: 'Ticket to the childhood', color: 'red' },
-    { id: 'RETRO_80S', label: '80s Neon', icon: Sparkles, desc: 'Retro colors and doodles', color: 'pink' },
-    { id: 'VINTAGE_TV', label: 'TV View', icon: Tv, desc: 'Through the broadcast lens', color: 'blue' },
-    { id: 'POSTCARD', label: 'Postcard', icon: Mail, desc: 'Aged paper and stamps', color: 'orange' },
+  const fonts = [
+    { name: 'Playfair Display', label: 'Classic Serif' },
+    { name: 'Special Elite', label: 'Typewriter' },
+    { name: 'Pacifico', label: 'Vintage Script' },
+    { name: 'Dancing Script', label: 'Flowy Hand' },
+    { name: 'Bungee Shade', label: 'Retro Block' }
   ];
 
+  const classicStyles: { id: PhotoStyle, label: string, icon: any, desc: string }[] = [
+    { id: 'FILM_ROLL', label: 'Film Roll', icon: Film, desc: 'Classic 35mm with sprockets' },
+    { id: 'ANALOG_STRIP', label: 'Analog Strip', icon: Layers, desc: 'Sepia toned vintage memory' },
+    { id: 'MOVIE_TICKET', label: 'Ticket Stub', icon: Ticket, desc: 'Ticket to the childhood' },
+    { id: 'RETRO_80S', label: '80s Neon', icon: Sparkles, desc: 'Retro colors and doodles' },
+    { id: 'VINTAGE_TV', label: 'TV View', icon: Tv, desc: 'Through the broadcast lens' },
+    { id: 'POSTCARD', label: 'Postcard', icon: Mail, desc: 'Aged paper and stamps' },
+  ];
+
+  const valentineStyles: { id: PhotoStyle, label: string, icon: any, desc: string }[] = [
+    { id: 'VAL_HAPPY_CHERRY', label: 'Sweet Hearts', icon: Heart, desc: 'Scalloped heart frames with cherries' },
+    { id: 'VAL_BE_MINE', label: 'Be Mine', icon: Circle, desc: 'Cherry circles & pink pattern' },
+    { id: 'VAL_BOWS', label: 'Pink Bows', icon: Star, desc: 'Ribbons & bows aesthetic' },
+    { id: 'VAL_KISSES', label: 'Lip Prints', icon: Sparkles, desc: 'Kisses & oval vintage frames' },
+    { id: 'VAL_RIBBON', label: 'Red Ribbon', icon: Layers, desc: 'Big ribbon header & classic red' },
+  ];
+
+  const currentStyles = viewMode === 'VALENTINE' ? valentineStyles : classicStyles;
+  const isVal = viewMode === 'VALENTINE';
+
+  const handleModeChange = (mode: 'CLASSIC' | 'VALENTINE') => {
+    setViewMode(mode);
+    setStyle(mode === 'VALENTINE' ? 'VAL_HAPPY_CHERRY' : 'FILM_ROLL');
+    setAnnotationFont(mode === 'VALENTINE' ? 'Pacifico' : 'Playfair Display');
+    setAnnotation1('NAME 1');
+    setAnnotation2('NAME 2');
+  };
+
   return (
-    <div className="relative h-full w-full flex flex-col items-center bg-[#1a0a0a] overflow-y-auto p-4 sm:p-6 md:p-8">
-      <div className="fixed inset-0 velvet-curtain opacity-20 pointer-events-none"></div>
+    <div className={`relative h-full w-full flex flex-col items-center overflow-y-auto p-4 sm:p-6 md:p-8 transition-colors duration-700 ${isVal ? 'bg-rose-50' : 'bg-[#1a0a0a]'}`}>
+      <div className={`fixed inset-0 pointer-events-none transition-opacity duration-700 ${isVal ? 'bg-[radial-gradient(circle_at_center,_#fff1f2_0%,_#ffe4e6_100%)] opacity-100' : 'velvet-curtain opacity-20'}`}></div>
       
       <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-6 py-6 md:py-12 pb-24">
         
-        <div className="w-full bg-zinc-900/90 border border-amber-900/40 rounded-xl p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl ring-1 ring-amber-500/10">
+        <div className={`w-full border rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl ring-1 transition-all duration-700 ${isVal ? 'bg-white/90 border-rose-200 ring-rose-300/30' : 'bg-zinc-900/90 border-amber-900/40 ring-amber-500/10'}`}>
           <div className="relative w-full h-12 mb-8">
-            <Marquee size="small" />
+            <Marquee size="small" variant={isVal ? 'valentine' : 'classic'} />
           </div>
           
           <div className="text-center mb-10">
-            <h2 className="title-font text-3xl sm:text-4xl md:text-6xl text-amber-400 mb-2 tracking-tight leading-none">
-              DEVELOPMENT STUDIO
+            <h2 className={`title-font text-4xl sm:text-5xl md:text-7xl mb-2 tracking-tight leading-none transition-colors duration-700 ${isVal ? 'text-rose-600 drop-shadow-[0_2px_2px_rgba(255,255,255,1)]' : 'text-amber-400'}`}>
+              {isVal ? 'THE LOVE STUDIO' : 'DEVELOPMENT STUDIO'}
             </h2>
-            <p className="retro-font text-amber-200/40 uppercase tracking-[0.2em] text-[10px] sm:text-xs">
-              Curate your vintage photobooth aesthetic
+            <p className={`retro-font uppercase tracking-[0.2em] text-[10px] sm:text-xs transition-colors duration-700 ${isVal ? 'text-rose-400' : 'text-amber-200/40'}`}>
+              Curate your {isVal ? 'romantic' : 'vintage'} photobooth aesthetic
             </p>
           </div>
 
-          <div className="space-y-10 md:space-y-14">
-            {/* 1. Orientation */}
+          <div className="flex justify-center mb-10 gap-6">
+            <button 
+              onClick={() => handleModeChange('CLASSIC')}
+              className={`px-8 py-3 rounded-full border-2 retro-font text-xs transition-all font-bold ${!isVal ? 'bg-amber-500 text-zinc-950 border-amber-200 shadow-lg scale-105' : 'border-rose-100 text-rose-300 hover:border-rose-200 hover:text-rose-400'}`}
+            >
+              CLASSIC
+            </button>
+            <button 
+              onClick={() => handleModeChange('VALENTINE')}
+              className={`px-8 py-3 rounded-full border-2 retro-font text-xs transition-all flex items-center gap-2 font-bold ${isVal ? 'bg-rose-500 text-white border-rose-200 shadow-rose-200 shadow-xl scale-105' : 'border-zinc-800 text-zinc-500 hover:border-rose-200 hover:text-rose-300'}`}
+            >
+              <Heart size={16} className={isVal ? 'fill-white' : ''} />
+              VALENTINE'S SPECIAL
+            </button>
+          </div>
+
+          <div className="space-y-12 md:space-y-16">
+            
+            {/* 01. Strip Layout */}
             <section className="space-y-6">
-              <h3 className="retro-font text-amber-500/80 uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2">
-                <span className="w-6 sm:w-8 h-px bg-amber-900/50"></span>
-                01. Select Layout
-                <span className="flex-1 h-px bg-amber-900/50"></span>
+              <h3 className={`retro-font uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2 transition-colors duration-700 ${isVal ? 'text-rose-400 font-black' : 'text-amber-500/80'}`}>
+                <span className={`w-6 sm:w-8 h-px transition-colors duration-700 ${isVal ? 'bg-rose-200' : 'bg-amber-900/50'}`}></span>
+                01. Strip Layout
+                <span className={`flex-1 h-px transition-colors duration-700 ${isVal ? 'bg-rose-200' : 'bg-amber-900/50'}`}></span>
               </h3>
-              <div className="flex gap-3 sm:gap-4 max-w-md mx-auto">
+              <div className="flex gap-4 max-w-md mx-auto">
                 <button 
                   onClick={() => setOrientation('VERTICAL')}
-                  className={`flex-1 flex flex-col items-center gap-2 sm:gap-3 p-4 sm:p-5 border-2 transition-all duration-300 ${orientation === 'VERTICAL' ? 'border-amber-400 bg-amber-400/10 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700'}`}
+                  className={`flex-1 flex flex-col items-center justify-center gap-3 p-5 border-2 transition-all duration-300 rounded-xl ${orientation === 'VERTICAL' ? (isVal ? 'border-rose-400 bg-rose-50 text-rose-500 shadow-md' : 'border-amber-400 bg-amber-400/10 text-amber-400 shadow-md') : (isVal ? 'border-rose-100 text-rose-200 hover:border-rose-200' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700')}`}
                 >
-                  <div className="w-4 h-7 sm:w-6 sm:h-10 border-2 border-current rounded-sm opacity-60"></div>
-                  <span className="retro-font text-[9px] sm:text-[10px] uppercase font-bold tracking-tight">Vertical Strip</span>
+                  <div className="w-5 h-9 border-2 border-current rounded-sm opacity-60"></div>
+                  <span className="retro-font text-[10px] uppercase font-bold tracking-tight text-center w-full">Vertical</span>
                 </button>
                 <button 
                   onClick={() => setOrientation('HORIZONTAL')}
-                  className={`flex-1 flex flex-col items-center gap-2 sm:gap-3 p-4 sm:p-5 border-2 transition-all duration-300 ${orientation === 'HORIZONTAL' ? 'border-amber-400 bg-amber-400/10 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700'}`}
+                  className={`flex-1 flex flex-col items-center justify-center gap-3 p-5 border-2 transition-all duration-300 rounded-xl ${orientation === 'HORIZONTAL' ? (isVal ? 'border-rose-400 bg-rose-50 text-rose-500 shadow-md' : 'border-amber-400 bg-amber-400/10 text-amber-400 shadow-md') : (isVal ? 'border-rose-100 text-rose-200 hover:border-rose-200' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700')}`}
                 >
-                  <div className="w-7 h-4 sm:w-10 sm:h-6 border-2 border-current rounded-sm opacity-60"></div>
-                  <span className="retro-font text-[9px] sm:text-[10px] uppercase font-bold tracking-tight">Horizontal Roll</span>
+                  <div className="w-9 h-5 border-2 border-current rounded-sm opacity-60"></div>
+                  <span className="retro-font text-[10px] uppercase font-bold tracking-tight text-center w-full">Horizontal</span>
                 </button>
               </div>
             </section>
 
-            {/* 2. Personalization */}
+            {/* 02. Personalization / Signature */}
             <section className="space-y-6">
               <div className="flex justify-between items-end gap-4">
-                <h3 className="retro-font text-amber-500/80 uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2 flex-1">
-                  <span className="w-6 sm:w-8 h-px bg-amber-900/50"></span>
-                  02. Personalization
-                  <span className="flex-1 h-px bg-amber-900/50"></span>
+                <h3 className={`retro-font uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2 flex-1 transition-colors duration-700 ${isVal ? 'text-rose-400 font-black' : 'text-amber-500/80'}`}>
+                  <span className={`w-6 sm:w-8 h-px transition-colors duration-700 ${isVal ? 'bg-rose-200' : 'bg-amber-900/50'}`}></span>
+                  02. Signature
+                  <span className={`flex-1 h-px transition-colors duration-700 ${isVal ? 'bg-rose-200' : 'bg-amber-900/50'}`}></span>
                 </h3>
                 <button 
                   onClick={() => setEnableAnnotations(!enableAnnotations)}
-                  className="flex items-center gap-2 px-4 py-1.5 bg-zinc-800 border border-zinc-700 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                  className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-colors shrink-0 ${isVal ? 'bg-rose-50 border-rose-200 hover:bg-rose-100' : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'}`}
                 >
-                  {enableAnnotations ? <ToggleRight className="text-amber-400" size={18} /> : <ToggleLeft className="text-zinc-500" size={18} />}
-                  <span className="retro-font text-[9px] uppercase text-amber-100/70">{enableAnnotations ? 'Annotations ON' : 'No Annotations'}</span>
+                  {enableAnnotations ? <ToggleRight className={isVal ? 'text-rose-500' : 'text-amber-400'} size={20} /> : <ToggleLeft className="text-zinc-500" size={20} />}
+                  <span className={`retro-font text-[10px] uppercase font-bold ${isVal ? 'text-rose-600' : 'text-amber-100/70'}`}>{enableAnnotations ? 'Active' : 'Muted'}</span>
                 </button>
               </div>
 
-              <div className={`grid grid-cols-1 md:grid-cols-3 gap-5 transition-all duration-300 ${enableAnnotations ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none -translate-y-2'}`}>
-                <div className="space-y-2">
-                  <label className="retro-font text-[10px] text-amber-200/50 uppercase ml-1">Annotation 1</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400/40" />
+              <div className={`space-y-8 transition-all duration-300 ${enableAnnotations ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none -translate-y-2'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="space-y-2">
+                    <label className={`retro-font text-[10px] uppercase ml-1 font-bold ${isVal ? 'text-rose-400' : 'text-amber-200/50'}`}>Name 1</label>
+                    <div className="relative">
+                      <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isVal ? 'text-rose-300' : 'text-amber-400/40'}`} />
+                      <input 
+                        type="text" 
+                        value={annotation1}
+                        disabled={!enableAnnotations}
+                        onChange={(e) => setAnnotation1(e.target.value.toUpperCase())}
+                        className={`w-full rounded-xl px-10 py-3 retro-font focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-50 text-rose-600 focus:border-rose-400 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className={`retro-font text-[10px] uppercase ml-1 font-bold ${isVal ? 'text-rose-400' : 'text-amber-200/50'}`}>Name 2</label>
+                    <div className="relative">
+                      <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isVal ? 'text-rose-300' : 'text-amber-400/40'}`} />
+                      <input 
+                        type="text" 
+                        value={annotation2}
+                        disabled={!enableAnnotations}
+                        onChange={(e) => setAnnotation2(e.target.value.toUpperCase())}
+                        className={`w-full rounded-xl px-10 py-3 retro-font focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-50 text-rose-600 focus:border-rose-400 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className={`retro-font text-[10px] uppercase ml-1 font-bold ${isVal ? 'text-rose-400' : 'text-amber-200/50'}`}>{isVal ? 'Date of Passion' : 'Studio Date'}</label>
                     <input 
                       type="text" 
-                      value={annotation1}
+                      value={date}
                       disabled={!enableAnnotations}
-                      onChange={(e) => setAnnotation1(e.target.value.toUpperCase())}
-                      className="w-full bg-black/40 border border-zinc-800 rounded px-10 py-2.5 retro-font text-amber-200 focus:outline-none focus:border-amber-400 transition-colors"
-                      placeholder="NAME ONE"
+                      onChange={(e) => setDate(e.target.value)}
+                      className={`w-full rounded-xl px-4 py-3 retro-font focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-50 text-rose-600 focus:border-rose-400 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="retro-font text-[10px] text-amber-200/50 uppercase ml-1">Annotation 2</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400/40" />
-                    <input 
-                      type="text" 
-                      value={annotation2}
-                      disabled={!enableAnnotations}
-                      onChange={(e) => setAnnotation2(e.target.value.toUpperCase())}
-                      className="w-full bg-black/40 border border-zinc-800 rounded px-10 py-2.5 retro-font text-amber-200 focus:outline-none focus:border-amber-400 transition-colors"
-                      placeholder="NAME TWO"
-                    />
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Type className={`w-4 h-4 ${isVal ? 'text-rose-400' : 'text-amber-500/60'}`} />
+                    <label className={`retro-font text-[10px] uppercase font-bold ${isVal ? 'text-rose-400' : 'text-amber-200/50'}`}>Handwriting Style</label>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="retro-font text-[10px] text-amber-200/50 uppercase ml-1">Date</label>
-                  <input 
-                    type="text" 
-                    value={date}
-                    disabled={!enableAnnotations}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-black/40 border border-zinc-800 rounded px-4 py-2.5 retro-font text-amber-200 focus:outline-none focus:border-amber-400 transition-colors"
-                    placeholder="DD.MM.YY"
-                  />
+                  <div className="flex flex-wrap gap-3">
+                    {fonts.map((f) => (
+                      <button
+                        key={f.name}
+                        onClick={() => setAnnotationFont(f.name)}
+                        className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 ${annotationFont === f.name ? (isVal ? 'border-rose-500 bg-rose-500 text-white shadow-lg' : 'border-amber-400 bg-amber-400/10 text-amber-200') : (isVal ? 'border-rose-100 bg-white text-rose-300 hover:border-rose-200' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700')}`}
+                        style={{ fontFamily: f.name }}
+                      >
+                        <span className="text-sm font-bold tracking-tight">{f.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </section>
 
-            {/* 3. Style Grid */}
+            {/* 03. Frame Aesthetic */}
             <section className="space-y-6">
-              <h3 className="retro-font text-amber-500/80 uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2">
-                <span className="w-6 sm:w-8 h-px bg-amber-900/50"></span>
-                03. Choose Aesthetic Style
-                <span className="flex-1 h-px bg-amber-900/50"></span>
+              <h3 className={`retro-font uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2 transition-colors duration-700 ${isVal ? 'text-rose-400 font-black' : 'text-amber-500/80'}`}>
+                <span className={`w-6 sm:w-8 h-px transition-colors duration-700 ${isVal ? 'bg-rose-200' : 'bg-amber-900/50'}`}></span>
+                03. Frame Aesthetic
+                <span className={`flex-1 h-px transition-colors duration-700 ${isVal ? 'bg-rose-200' : 'bg-amber-900/50'}`}></span>
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                {styles.map((s) => (
+              <div className={`grid gap-4 ${isVal ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-3'}`}>
+                {currentStyles.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => setStyle(s.id)}
-                    className={`group relative flex flex-col p-4 sm:p-5 border-2 transition-all duration-300 text-left overflow-hidden ${style === s.id ? 'border-amber-400 bg-amber-400/5 shadow-[0_0_20px_rgba(251,191,36,0.1)]' : 'border-zinc-800 hover:border-zinc-700'}`}
+                    className={`group relative flex flex-col p-5 border-2 transition-all duration-300 text-left overflow-hidden rounded-xl ${style === s.id ? (isVal ? 'border-rose-500 bg-rose-50 shadow-xl shadow-rose-200/40 ring-1 ring-rose-400' : 'border-amber-400 bg-amber-400/5 shadow-lg shadow-amber-900/20') : (isVal ? 'border-rose-100 bg-white/40 text-rose-300 hover:border-rose-200 hover:bg-white' : 'border-zinc-800 hover:border-zinc-700')}`}
                   >
-                    <div className={`mb-3 sm:mb-4 p-2 sm:p-2.5 rounded-lg w-fit transition-colors ${style === s.id ? 'bg-amber-400 text-zinc-950' : 'bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700'}`}>
-                      <s.icon size={18} className="sm:size-6" />
+                    <div className={`mb-4 p-3 rounded-xl w-fit transition-colors ${style === s.id ? (isVal ? 'bg-rose-500 text-white scale-110' : 'bg-amber-400 text-zinc-950') : (isVal ? 'bg-rose-100 text-rose-400' : 'bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700')}`}>
+                      <s.icon size={28} className={style === s.id && isVal ? 'fill-white' : ''} />
                     </div>
-                    <span className={`retro-font text-[10px] sm:text-xs uppercase font-black tracking-tight mb-1 transition-colors ${style === s.id ? 'text-amber-400' : 'text-zinc-300'}`}>
+                    <span className={`retro-font text-sm uppercase font-black tracking-tight mb-1 transition-colors ${style === s.id ? (isVal ? 'text-rose-600' : 'text-amber-400') : (isVal ? 'text-rose-400' : 'text-zinc-300')}`}>
                       {s.label}
                     </span>
-                    <span className="retro-font text-[8px] sm:text-[9px] text-zinc-500 uppercase leading-tight">
+                    <span className={`retro-font text-[10px] uppercase leading-tight transition-colors ${isVal ? 'text-rose-300' : 'text-zinc-500'}`}>
                       {s.desc}
                     </span>
                   </button>
                 ))}
               </div>
             </section>
+
           </div>
 
-          <div className="mt-12 md:mt-16 flex justify-center">
+          <div className="mt-14 md:mt-20 flex justify-center">
             <button
-              onClick={() => onConfirm({ style, orientation, annotation1, annotation2, date, enableAnnotations })}
-              className="group relative px-10 py-5 sm:px-14 sm:py-6 bg-amber-600 hover:bg-amber-500 transition-all duration-300 border-4 border-amber-200 shadow-2xl flex items-center gap-3 sm:gap-4 active:scale-95"
+              onClick={() => onConfirm({ style, orientation, annotation1, annotation2, date, enableAnnotations, annotationFont })}
+              className={`group relative px-12 py-6 sm:px-16 sm:py-7 transition-all duration-300 border-4 shadow-2xl flex items-center gap-4 active:scale-95 rounded-xl ${isVal ? 'bg-rose-500 hover:bg-rose-400 border-rose-100 shadow-rose-300/50' : 'bg-amber-600 hover:bg-amber-500 border-amber-200'}`}
             >
-              <div className="absolute -inset-1 border border-amber-200 opacity-30 group-hover:opacity-100 transition-opacity"></div>
-              <span className="retro-font text-lg sm:text-2xl text-zinc-950 font-black uppercase tracking-tighter">Enter Booth</span>
-              <ChevronRight size={24} className="text-zinc-950 group-hover:translate-x-2 transition-transform" />
+              <div className={`absolute -inset-1 border opacity-30 group-hover:opacity-100 transition-opacity rounded-xl ${isVal ? 'border-white' : 'border-amber-200'}`}></div>
+              <span className={`retro-font text-xl sm:text-3xl font-black uppercase tracking-tighter ${isVal ? 'text-white' : 'text-zinc-950'}`}>
+                {isVal ? 'Create Love' : 'Enter The Booth'}
+              </span>
+              <ChevronRight size={28} className={`${isVal ? 'text-white' : 'text-zinc-950'} group-hover:translate-x-2 transition-transform`} />
             </button>
           </div>
         </div>
