@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import LandingScreen from './components/LandingScreen.tsx';
 import ConfigScreen from './components/ConfigScreen.tsx';
@@ -71,8 +70,13 @@ const App: React.FC = () => {
     setCurrentState(AppState.CONFIG);
   };
 
+  const isValentine = config.style.startsWith('VAL');
+
   return (
-    <div className={`relative h-screen w-screen overflow-hidden transition-colors duration-700 ${config.style.startsWith('VAL') ? 'bg-rose-50' : 'bg-zinc-950'} selection:bg-rose-200`}>
+    <div className={`relative h-screen w-screen overflow-hidden transition-colors duration-700 ${isValentine ? 'bg-rose-50' : 'bg-zinc-950'} selection:bg-rose-200`}>
+      {/* Conditionally render vignette based on theme */}
+      <div className={`vignette fixed inset-0 z-[9998] pointer-events-none transition-opacity duration-700 ${isValentine ? 'opacity-0' : 'opacity-100'}`} />
+
       {currentState === AppState.LANDING && (
         <LandingScreen onEnter={enterConfig} />
       )}
