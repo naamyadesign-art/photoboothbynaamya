@@ -9,18 +9,20 @@ interface ConfigScreenProps {
 }
 
 const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
+  // We still keep the check for conditional logic, but default to CLASSIC initially
   const isValentinesSeason = useMemo(() => {
     const now = new Date();
     return now.getMonth() === 1 && now.getDate() <= 14;
   }, []);
 
-  const [viewMode, setViewMode] = useState<'CLASSIC' | 'VALENTINE'>(isValentinesSeason ? 'VALENTINE' : 'CLASSIC');
-  const [style, setStyle] = useState<PhotoStyle>(viewMode === 'VALENTINE' ? 'VAL_HAPPY_CHERRY' : 'FILM_ROLL');
+  // Set initial view to CLASSIC as requested
+  const [viewMode, setViewMode] = useState<'CLASSIC' | 'VALENTINE'>('CLASSIC');
+  const [style, setStyle] = useState<PhotoStyle>('FILM_ROLL');
   const [orientation, setOrientation] = useState<Orientation>('VERTICAL');
   const [annotation1, setAnnotation1] = useState('NAME 1');
   const [annotation2, setAnnotation2] = useState('NAME 2');
   const [enableAnnotations, setEnableAnnotations] = useState(true);
-  const [annotationFont, setAnnotationFont] = useState(viewMode === 'VALENTINE' ? 'Pacifico' : 'Playfair Display');
+  const [annotationFont, setAnnotationFont] = useState('Playfair Display');
   
   const today = new Date().toLocaleDateString('en-GB', { 
     day: '2-digit', 

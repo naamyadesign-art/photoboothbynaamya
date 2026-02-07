@@ -42,16 +42,16 @@ const App: React.FC = () => {
   const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
   
   const now = new Date();
-  const isValentinesSeason = now.getMonth() === 1 && now.getDate() <= 14;
 
+  // Initialize with CLASSIC defaults as requested
   const [config, setConfig] = useState<BoothConfig>({
-    style: isValentinesSeason ? 'VAL_HAPPY_CHERRY' : 'FILM_ROLL',
+    style: 'FILM_ROLL',
     orientation: 'VERTICAL',
     annotation1: '',
     annotation2: '',
     date: now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.'),
     enableAnnotations: true,
-    annotationFont: isValentinesSeason ? 'Pacifico' : 'Playfair Display'
+    annotationFont: 'Playfair Display'
   });
 
   const enterConfig = () => setCurrentState(AppState.CONFIG);
