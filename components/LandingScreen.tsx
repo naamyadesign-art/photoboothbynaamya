@@ -36,7 +36,7 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onEnter }) => {
           <h1 className="title-font text-4xl sm:text-6xl md:text-8xl text-amber-400 drop-shadow-[0_10px_10px_rgba(0,0,0,1)] leading-tight">
             PHOTOBOOTH
           </h1>
-          <p className="retro-font text-sm sm:text-xl md:text-2xl text-amber-100/80 tracking-[0.15em] sm:tracking-widest uppercase">
+          <p className="retro-font text-sm sm:text-xl md:text-2xl text-amber-100 tracking-[0.15em] sm:tracking-widest uppercase font-bold">
             Grand Carnival • Est. 2005
           </p>
         </div>
@@ -51,7 +51,7 @@ const LandingScreen: React.FC<LandingScreenProps> = ({ onEnter }) => {
           </span>
         </button>
 
-        <div className="mt-4 md:mt-8 px-4 py-2 border border-amber-400/30 rounded-full retro-font text-[10px] sm:text-xs uppercase text-amber-400/60 animate-pulse">
+        <div className="mt-4 md:mt-8 px-6 py-3 border-2 border-amber-400/40 rounded-full retro-font text-xs sm:text-sm uppercase text-amber-400 animate-pulse font-bold bg-amber-950/20 backdrop-blur-sm">
           Prepare for your close-up
         </div>
       </div>

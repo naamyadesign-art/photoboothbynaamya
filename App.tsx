@@ -99,7 +99,7 @@ const App: React.FC = () => {
 
       {/* Restored static watermark style */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none transition-all duration-500">
-        <span className="retro-font text-[10px] sm:text-xs text-amber-400 font-bold tracking-[0.3em] uppercase bg-black/40 px-4 py-2 rounded-full border border-amber-400/40 backdrop-blur-md shadow-[0_0_20px_rgba(251,191,36,0.2)]">
+        <span className="retro-font text-xs sm:text-sm text-amber-400 font-black tracking-[0.3em] uppercase bg-black/60 px-6 py-3 rounded-full border-2 border-amber-400/50 backdrop-blur-md shadow-[0_0_30px_rgba(251,191,36,0.3)]">
           @madebynaamya
         </span>
       </div>

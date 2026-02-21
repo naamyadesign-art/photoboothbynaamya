@@ -113,7 +113,7 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
             <h2 className={`title-font text-4xl sm:text-5xl md:text-7xl mb-2 tracking-tight leading-none transition-colors duration-700 ${isVal ? 'text-rose-600 drop-shadow-[0_2px_2px_rgba(255,255,255,1)]' : 'text-amber-400'}`}>
               {isVal ? 'LOVE CAPSULE' : 'DEVELOPMENT STUDIO'}
             </h2>
-            <p className={`retro-font uppercase tracking-[0.2em] text-[10px] sm:text-xs transition-colors duration-700 ${isVal ? 'text-rose-500 font-bold' : 'text-amber-200/40'}`}>
+            <p className={`retro-font uppercase tracking-[0.2em] text-xs sm:text-sm transition-colors duration-700 ${isVal ? 'text-rose-500 font-black' : 'text-amber-200/70 font-bold'}`}>
               Curate your {isVal ? 'romantic' : 'vintage'} photobooth aesthetic
             </p>
           </div>
@@ -121,13 +121,13 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
           <div className="flex justify-center mb-10 gap-6">
             <button 
               onClick={() => handleModeChange('CLASSIC')}
-              className={`px-8 py-3 rounded-full border-2 retro-font text-xs transition-all font-bold ${!isVal ? 'bg-amber-500 text-zinc-950 border-amber-200 shadow-lg scale-105' : 'border-rose-200 text-rose-400 hover:border-rose-400 hover:text-rose-600'}`}
+              className={`px-8 py-3 rounded-full border-2 retro-font text-sm transition-all font-black ${!isVal ? 'bg-amber-500 text-zinc-950 border-amber-200 shadow-lg scale-105' : 'border-rose-200 text-rose-400 hover:border-rose-400 hover:text-rose-600'}`}
             >
               CLASSIC
             </button>
             <button 
               onClick={() => handleModeChange('VALENTINE')}
-              className={`px-8 py-3 rounded-full border-2 retro-font text-xs transition-all flex items-center gap-2 font-bold ${isVal ? 'bg-rose-500 text-white border-rose-200 shadow-rose-200 shadow-xl scale-105' : 'border-zinc-800 text-zinc-500 hover:border-rose-400 hover:text-rose-500'}`}
+              className={`px-8 py-3 rounded-full border-2 retro-font text-sm transition-all flex items-center gap-2 font-black ${isVal ? 'bg-rose-500 text-white border-rose-200 shadow-rose-200 shadow-xl scale-105' : 'border-zinc-800 text-zinc-500 hover:border-rose-400 hover:text-rose-500'}`}
             >
               <Heart size={16} className={isVal ? 'fill-white' : ''} />
               {isValentinesSeason ? "VALENTINE'S SPECIAL" : "PREMIUM: LOVE CAPSULE"}
@@ -139,8 +139,8 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
             
             {/* 01. Strip Layout */}
             <section className="space-y-6">
-              <h3 className={`retro-font uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2 transition-colors duration-700 ${isVal ? 'text-rose-600 font-black' : 'text-amber-500/80'}`}>
-                <span className={`w-6 sm:w-8 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
+              <h3 className={`retro-font uppercase tracking-widest text-sm sm:text-base flex items-center gap-2 transition-colors duration-700 ${isVal ? 'text-rose-600 font-black' : 'text-amber-500 font-black'}`}>
+                <span className={`w-8 sm:w-12 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
                 01. Strip Layout
                 <span className={`flex-1 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
               </h3>
@@ -149,15 +149,15 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
                   onClick={() => setOrientation('VERTICAL')}
                   className={`flex-1 flex flex-col items-center justify-center gap-3 p-5 border-2 transition-all duration-300 rounded-xl ${orientation === 'VERTICAL' ? (isVal ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-md' : 'border-amber-400 bg-amber-400/10 text-amber-400 shadow-md') : (isVal ? 'border-rose-100 bg-rose-50/30 text-rose-400 hover:border-rose-300 hover:text-rose-500' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700')}`}
                 >
-                  <div className={`w-5 h-9 border-2 border-current rounded-sm transition-opacity ${orientation === 'VERTICAL' ? 'opacity-100' : 'opacity-40'}`}></div>
-                  <span className="retro-font text-[10px] uppercase font-bold tracking-tight text-center w-full">Vertical</span>
+                  <div className={`w-6 h-10 border-2 border-current rounded-sm transition-opacity ${orientation === 'VERTICAL' ? 'opacity-100' : 'opacity-40'}`}></div>
+                  <span className="retro-font text-sm sm:text-base uppercase font-black tracking-tight text-center w-full">Vertical</span>
                 </button>
                 <button 
                   onClick={() => setOrientation('HORIZONTAL')}
-                  className={`flex-1 flex flex-col items-center justify-center gap-3 p-5 border-2 transition-all duration-300 rounded-xl ${orientation === 'HORIZONTAL' ? (isVal ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-md' : 'border-amber-400 bg-amber-400/10 text-amber-400 shadow-md') : (isVal ? 'border-rose-100 bg-rose-50/30 text-rose-400 hover:border-rose-300 hover:text-rose-500' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700')}`}
+                  className={`flex-1 flex flex-col items-center justify-center gap-3 p-6 border-2 transition-all duration-300 rounded-xl ${orientation === 'HORIZONTAL' ? (isVal ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-md' : 'border-amber-400 bg-amber-400/10 text-amber-400 shadow-md') : (isVal ? 'border-rose-100 bg-rose-50/30 text-rose-400 hover:border-rose-300 hover:text-rose-500' : 'border-zinc-800 text-zinc-500 hover:border-zinc-700')}`}
                 >
-                  <div className={`w-9 h-5 border-2 border-current rounded-sm transition-opacity ${orientation === 'HORIZONTAL' ? 'opacity-100' : 'opacity-40'}`}></div>
-                  <span className="retro-font text-[10px] uppercase font-bold tracking-tight text-center w-full">Horizontal</span>
+                  <div className={`w-10 h-6 border-2 border-current rounded-sm transition-opacity ${orientation === 'HORIZONTAL' ? 'opacity-100' : 'opacity-40'}`}></div>
+                  <span className="retro-font text-sm sm:text-base uppercase font-black tracking-tight text-center w-full">Horizontal</span>
                 </button>
               </div>
             </section>
@@ -165,8 +165,8 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
             {/* 02. Personalization / Signature */}
             <section className="space-y-6">
               <div className="flex justify-between items-end gap-4">
-                <h3 className={`retro-font uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2 flex-1 transition-colors duration-700 ${isVal ? 'text-rose-600 font-black' : 'text-amber-500/80'}`}>
-                  <span className={`w-6 sm:w-8 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
+                <h3 className={`retro-font uppercase tracking-widest text-sm sm:text-base flex items-center gap-2 flex-1 transition-colors duration-700 ${isVal ? 'text-rose-600 font-black' : 'text-amber-500 font-black'}`}>
+                  <span className={`w-8 sm:w-12 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
                   02. Signature
                   <span className={`flex-1 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
                 </h3>
@@ -175,14 +175,14 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
                   className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-colors shrink-0 ${isVal ? 'bg-rose-50 border-rose-300 hover:bg-rose-100' : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'}`}
                 >
                   {enableAnnotations ? <ToggleRight className={isVal ? 'text-rose-500' : 'text-amber-400'} size={20} /> : <ToggleLeft className="text-zinc-500" size={20} />}
-                  <span className={`retro-font text-[10px] uppercase font-bold ${isVal ? 'text-rose-700' : 'text-amber-100/70'}`}>{enableAnnotations ? 'Active' : 'Muted'}</span>
+                  <span className={`retro-font text-xs uppercase font-black ${isVal ? 'text-rose-700' : 'text-amber-100'}`}>{enableAnnotations ? 'Active' : 'Muted'}</span>
                 </button>
               </div>
 
               <div className={`space-y-8 transition-all duration-300 ${enableAnnotations ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none -translate-y-2'}`}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div className="space-y-2">
-                    <label className={`retro-font text-[10px] uppercase ml-1 font-bold ${isVal ? 'text-rose-600' : 'text-amber-200/50'}`}>Name 1</label>
+                    <label className={`retro-font text-xs uppercase ml-1 font-black ${isVal ? 'text-rose-600' : 'text-amber-200/70'}`}>Name 1</label>
                     <div className="relative">
                       <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isVal ? 'text-rose-400' : 'text-amber-400/40'}`} />
                       <input 
@@ -190,12 +190,12 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
                         value={annotation1}
                         disabled={!enableAnnotations}
                         onChange={(e) => setAnnotation1(e.target.value.toUpperCase())}
-                        className={`w-full rounded-xl px-10 py-3 retro-font focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-100 text-rose-700 focus:border-rose-500 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
+                        className={`w-full rounded-xl px-10 py-3 retro-font text-sm focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-100 text-rose-700 focus:border-rose-500 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className={`retro-font text-[10px] uppercase ml-1 font-bold ${isVal ? 'text-rose-600' : 'text-amber-200/50'}`}>Name 2</label>
+                    <label className={`retro-font text-xs uppercase ml-1 font-black ${isVal ? 'text-rose-600' : 'text-amber-200/70'}`}>Name 2</label>
                     <div className="relative">
                       <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isVal ? 'text-rose-400' : 'text-amber-400/40'}`} />
                       <input 
@@ -203,18 +203,18 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
                         value={annotation2}
                         disabled={!enableAnnotations}
                         onChange={(e) => setAnnotation2(e.target.value.toUpperCase())}
-                        className={`w-full rounded-xl px-10 py-3 retro-font focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-100 text-rose-700 focus:border-rose-500 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
+                        className={`w-full rounded-xl px-10 py-3 retro-font text-sm focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-100 text-rose-700 focus:border-rose-500 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className={`retro-font text-[10px] uppercase ml-1 font-bold ${isVal ? 'text-rose-600' : 'text-amber-200/50'}`}>{isVal ? 'Date of Passion' : 'Studio Date'}</label>
+                    <label className={`retro-font text-xs uppercase ml-1 font-black ${isVal ? 'text-rose-600' : 'text-amber-200/70'}`}>{isVal ? 'Date of Passion' : 'Studio Date'}</label>
                     <input 
                       type="text" 
                       value={date}
                       disabled={!enableAnnotations}
                       onChange={(e) => setDate(e.target.value)}
-                      className={`w-full rounded-xl px-4 py-3 retro-font focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-100 text-rose-700 focus:border-rose-500 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
+                      className={`w-full rounded-xl px-4 py-3 retro-font text-sm focus:outline-none transition-all ${isVal ? 'bg-white border-2 border-rose-100 text-rose-700 focus:border-rose-500 shadow-sm' : 'bg-black/40 border border-zinc-800 text-amber-200 focus:border-amber-400'}`}
                     />
                   </div>
                 </div>
@@ -222,7 +222,7 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Type className={`w-4 h-4 ${isVal ? 'text-rose-500' : 'text-amber-500/60'}`} />
-                    <label className={`retro-font text-[10px] uppercase font-bold ${isVal ? 'text-rose-600' : 'text-amber-200/50'}`}>Handwriting Style</label>
+                    <label className={`retro-font text-xs uppercase font-black ${isVal ? 'text-rose-600' : 'text-amber-200/70'}`}>Handwriting Style</label>
                   </div>
                   <div className="flex flex-wrap gap-3">
                     {fonts.map((f) => (
@@ -242,8 +242,8 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
 
             {/* 03. Frame Aesthetic */}
             <section className="space-y-6">
-              <h3 className={`retro-font uppercase tracking-widest text-[10px] sm:text-xs flex items-center gap-2 transition-colors duration-700 ${isVal ? 'text-rose-600 font-black' : 'text-amber-500/80'}`}>
-                <span className={`w-6 sm:w-8 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
+              <h3 className={`retro-font uppercase tracking-widest text-sm sm:text-base flex items-center gap-2 transition-colors duration-700 ${isVal ? 'text-rose-600 font-black' : 'text-amber-500 font-black'}`}>
+                <span className={`w-8 sm:w-12 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
                 03. Frame Aesthetic
                 <span className={`flex-1 h-px transition-colors duration-700 ${isVal ? 'bg-rose-300' : 'bg-amber-900/50'}`}></span>
               </h3>
@@ -258,10 +258,10 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
                       {/* Check if s.icon is a component or a Lucide icon */}
                       {typeof s.icon === 'function' ? <s.icon size={28} /> : <s.icon size={28} className={style === s.id && isVal ? 'fill-white' : ''} />}
                     </div>
-                    <span className={`retro-font text-sm uppercase font-black tracking-tight mb-1 transition-colors ${style === s.id ? (isVal ? 'text-rose-700' : 'text-amber-400') : (isVal ? 'text-rose-500' : 'text-zinc-300')}`}>
+                    <span className={`retro-font text-base uppercase font-black tracking-tight mb-1 transition-colors ${style === s.id ? (isVal ? 'text-rose-700' : 'text-amber-400') : (isVal ? 'text-rose-500' : 'text-zinc-300')}`}>
                       {s.label}
                     </span>
-                    <span className={`retro-font text-[10px] uppercase leading-tight transition-colors ${isVal ? 'text-rose-400' : 'text-zinc-500'}`}>
+                    <span className={`retro-font text-xs uppercase leading-tight transition-colors ${isVal ? 'text-rose-400' : 'text-zinc-500 font-bold'}`}>
                       {s.desc}
                     </span>
                   </button>

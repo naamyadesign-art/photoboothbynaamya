@@ -148,9 +148,9 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
           <div className="relative w-full h-12 sm:h-16 md:h-20 max-w-2xl">
             <Marquee size="small" />
           </div>
-          <div className="bg-amber-900/40 px-3 sm:px-4 py-1 rounded-full border border-amber-500/30 flex flex-wrap justify-center items-center gap-2 sm:gap-4 retro-font text-[8px] sm:text-[10px] uppercase tracking-tighter text-amber-200">
+          <div className="bg-amber-900/60 px-4 sm:px-6 py-2 rounded-full border-2 border-amber-500/50 flex flex-wrap justify-center items-center gap-3 sm:gap-6 retro-font text-xs sm:text-sm uppercase tracking-tight text-amber-100 font-bold backdrop-blur-md">
             <span>Style: {config.style.replace('_', ' ')}</span>
-            <span className="hidden sm:inline opacity-30">|</span>
+            <span className="hidden sm:inline opacity-40">|</span>
             <span>Orientation: {config.orientation}</span>
           </div>
         </div>
@@ -194,8 +194,8 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
               <div className={`absolute inset-0 bg-white z-50 transition-opacity duration-75 pointer-events-none ${flash ? 'opacity-100' : 'opacity-0'}`}></div>
 
               {isCapturing && (
-                <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-red-600 px-2 sm:px-3 py-0.5 sm:py-1 flex items-center gap-1.5 sm:gap-2 retro-font animate-pulse z-20 text-[9px] sm:text-xs">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></div>
+                <div className="absolute top-3 left-3 sm:top-6 sm:left-6 bg-red-600 px-3 sm:px-4 py-1 sm:py-1.5 flex items-center gap-2 sm:gap-3 retro-font animate-pulse z-20 text-xs sm:text-sm font-black border-2 border-white/20 shadow-xl">
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-white"></div>
                   REC ({capturedSoFar.length}/4)
                 </div>
               )}
@@ -210,8 +210,8 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
                 onClick={startSequence}
                 className="group flex flex-1 items-center justify-center gap-3 px-6 py-4 sm:px-8 sm:py-5 bg-red-700 hover:bg-red-600 border-[3px] sm:border-4 border-red-300 shadow-2xl active:scale-95 transition-all"
               >
-                <Camera size={18} className="sm:size-[24px] text-white" />
-                <span className="retro-font text-sm sm:text-lg text-white uppercase font-black tracking-tighter">Live Session</span>
+                <Camera size={20} className="sm:size-[28px] text-white" />
+                <span className="retro-font text-base sm:text-xl text-white uppercase font-black tracking-tight">Live Session</span>
               </button>
             )}
 
@@ -219,10 +219,10 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
               onClick={() => fileInputRef.current?.click()}
               className="group flex flex-1 items-center justify-center gap-3 px-6 py-4 sm:px-8 sm:py-5 bg-zinc-800 hover:bg-zinc-700 border-[3px] sm:border-4 border-zinc-600 shadow-2xl active:scale-95 transition-all"
             >
-              <Upload size={18} className="sm:size-[24px] text-amber-400" />
+              <Upload size={20} className="sm:size-[28px] text-amber-400" />
               <div className="text-left">
-                <span className="block retro-font text-sm sm:text-lg text-amber-100 uppercase font-black leading-none tracking-tighter">Upload Photos</span>
-                <span className="hidden sm:block retro-font text-[8px] text-amber-400/60 uppercase mt-1">Select 4 from gallery</span>
+                <span className="block retro-font text-base sm:text-xl text-amber-100 uppercase font-black leading-none tracking-tight">Upload Photos</span>
+                <span className="hidden sm:block retro-font text-[10px] text-amber-400 font-bold uppercase mt-1">Select 4 from gallery</span>
               </div>
             </button>
             <input 
@@ -237,9 +237,9 @@ const BoothInterior: React.FC<BoothInteriorProps> = ({ config, onComplete }) => 
         )}
 
         {isUploading && (
-          <div className="flex flex-col items-center gap-2 animate-pulse py-4">
-             <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-             <span className="retro-font text-amber-500 text-[10px] sm:text-sm uppercase tracking-widest">Importing Gallery...</span>
+          <div className="flex flex-col items-center gap-3 animate-pulse py-6">
+             <div className="w-8 h-8 sm:w-10 sm:h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+             <span className="retro-font text-amber-500 text-xs sm:text-lg font-black uppercase tracking-widest">Importing Gallery...</span>
           </div>
         )}
       </div>

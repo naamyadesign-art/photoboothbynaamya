@@ -49,14 +49,14 @@ const ResultView: React.FC<ResultViewProps> = ({ photos, config, onRestart }) =>
           <h2 className="title-font text-5xl md:text-7xl text-amber-400 drop-shadow-md">
             VOILÀ!
           </h2>
-          <p className="retro-font text-amber-200/60 mt-2 uppercase tracking-[0.3em]">Your Masterpiece is Developed</p>
+          <p className="retro-font text-amber-200 text-sm md:text-lg mt-3 uppercase tracking-[0.3em] font-bold">Your Masterpiece is Developed</p>
         </div>
 
         <div className="relative group p-4 bg-zinc-900 border border-amber-900/20 shadow-2xl">
           {isProcessing ? (
             <div className={`flex flex-col items-center justify-center bg-zinc-950 border-2 border-zinc-800 rounded-sm ${config.orientation === 'VERTICAL' ? 'w-[300px] h-[600px]' : 'w-[800px] h-[300px] max-w-full'}`}>
-              <RefreshCw className="w-12 h-12 animate-spin text-amber-600 mb-4" />
-              <p className="retro-font text-amber-600 animate-pulse uppercase">Developing Film...</p>
+              <RefreshCw className="w-12 h-12 animate-spin text-amber-500 mb-4" />
+              <p className="retro-font text-amber-500 text-lg animate-pulse uppercase font-black">Developing Film...</p>
             </div>
           ) : (
             <div className="overflow-hidden">
@@ -81,10 +81,10 @@ const ResultView: React.FC<ResultViewProps> = ({ photos, config, onRestart }) =>
 
           <button
             onClick={onRestart}
-            className="group flex items-center gap-2 px-8 py-5 border-2 border-zinc-700 hover:bg-zinc-800/50 text-zinc-300 transition-all active:scale-95"
+            className="group flex items-center gap-2 px-8 py-5 border-2 border-zinc-600 hover:bg-zinc-800/50 text-zinc-100 transition-all active:scale-95 bg-zinc-900 shadow-xl"
           >
-            <RefreshCw size={20} />
-            <span className="retro-font uppercase">Take More Photos</span>
+            <RefreshCw size={22} className="text-amber-400" />
+            <span className="retro-font text-lg uppercase font-black">Take More Photos</span>
           </button>
         </div>
       </div>
