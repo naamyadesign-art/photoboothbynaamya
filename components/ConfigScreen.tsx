@@ -48,6 +48,11 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
 
   // Set initial view to CLASSIC as requested
   const [viewMode, setViewMode] = useState<'CLASSIC' | 'VALENTINE'>('CLASSIC');
+  const [isValUnlocked, setIsValUnlocked] = useState(false);
+  const [showPasscodePrompt, setShowPasscodePrompt] = useState(false);
+  const [passcodeInput, setPasscodeInput] = useState('');
+  const [passcodeError, setPasscodeError] = useState(false);
+
   const [style, setStyle] = useState<PhotoStyle>('FILM_ROLL');
   const [orientation, setOrientation] = useState<Orientation>('VERTICAL');
   const [annotation1, setAnnotation1] = useState('NAME 1');
@@ -91,11 +96,36 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
   const isVal = viewMode === 'VALENTINE';
 
   const handleModeChange = (mode: 'CLASSIC' | 'VALENTINE') => {
+    if (mode === 'VALENTINE' && !isValUnlocked) {
+      setShowPasscodePrompt(true);
+      return;
+    }
     setViewMode(mode);
     setStyle(mode === 'VALENTINE' ? 'VAL_HAPPY_CHERRY' : 'FILM_ROLL');
     setAnnotationFont(mode === 'VALENTINE' ? 'Pacifico' : 'Playfair Display');
     setAnnotation1('NAME 1');
     setAnnotation2('NAME 2');
+  };
+
+  const handlePasscodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passcodeInput === '248117') {
+      setIsValUnlocked(true);
+      setShowPasscodePrompt(false);
+      setPasscodeInput('');
+      setPasscodeError(false);
+      // Automatically switch to Valentine mode after successful unlock
+      setViewMode('VALENTINE');
+      setStyle('VAL_HAPPY_CHERRY');
+      setAnnotationFont('Pacifico');
+      setAnnotation1('NAME 1');
+      setAnnotation2('NAME 2');
+    } else {
+      setPasscodeError(true);
+      setPasscodeInput('');
+      // Shake animation or similar could be added here
+      setTimeout(() => setPasscodeError(false), 1000);
+    }
   };
 
   return (
@@ -131,9 +161,57 @@ const ConfigScreen: React.FC<ConfigScreenProps> = ({ onConfirm }) => {
             >
               <Heart size={16} className={isVal ? 'fill-white' : ''} />
               {isValentinesSeason ? "VALENTINE'S SPECIAL" : "PREMIUM: LOVE CAPSULE"}
-              {!isValentinesSeason && !isVal && <Lock size={14} className="opacity-60 ml-1" />}
+              {!isValUnlocked && <Lock size={14} className="opacity-60 ml-1" />}
             </button>
           </div>
+
+          {showPasscodePrompt && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+              <div className="w-full max-w-md bg-zinc-900 border-2 border-amber-500/30 rounded-2xl p-8 shadow-[0_0_50px_rgba(251,191,36,0.1)]">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="title-font text-3xl text-amber-400 mb-2">RESTRICTED ACCESS</h3>
+                    <p className="retro-font text-xs text-amber-200/60 uppercase tracking-widest">Enter special code to unlock</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setShowPasscodePrompt(false);
+                      setPasscodeInput('');
+                      setPasscodeError(false);
+                    }}
+                    className="text-zinc-500 hover:text-white transition-colors"
+                  >
+                    <ChevronRight className="rotate-180" size={24} />
+                  </button>
+                </div>
+
+                <form onSubmit={handlePasscodeSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <input 
+                      type="password" 
+                      value={passcodeInput}
+                      onChange={(e) => setPasscodeInput(e.target.value)}
+                      placeholder="••••••"
+                      autoFocus
+                      className={`w-full bg-black/40 border-2 rounded-xl px-6 py-4 text-center text-2xl tracking-[0.5em] focus:outline-none transition-all ${passcodeError ? 'border-red-500 text-red-500 animate-shake' : 'border-zinc-800 text-amber-400 focus:border-amber-500'}`}
+                    />
+                    {passcodeError && (
+                      <p className="text-center retro-font text-[10px] text-red-500 uppercase font-black tracking-widest animate-pulse">
+                        Invalid Access Code
+                      </p>
+                    )}
+                  </div>
+
+                  <button 
+                    type="submit"
+                    className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-zinc-950 retro-font font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-lg shadow-amber-900/20"
+                  >
+                    Unlock Archive
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-12 md:space-y-16">
             
